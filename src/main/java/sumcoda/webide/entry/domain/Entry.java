@@ -37,4 +37,17 @@ public class Entry {
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
+    // Entry N <-> 1 Workspace
+    // 양방향 연관관계 편의 메서드
+    public void assignWorkspace(Workspace workspace) {
+        if (this.workspace != null) {
+            this.workspace.getEntries().remove(this);
+        }
+        this.workspace = workspace;
+
+        if (!workspace.getEntries().contains(this)) {
+            workspace.addEntry(this);
+        }
+    }
+
 }

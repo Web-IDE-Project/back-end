@@ -63,4 +63,14 @@ public class Workspace {
             memberWorkspace.assignWorkspace(this);
         }
     }
+
+    // Workspace 1 <-> N Entry
+    // 양방향 연관관계 편의 메서드
+    public void addEntry(Entry entry) {
+        this.entries.add(entry);
+
+        if (entry.getWorkspace() != this) {
+            entry.assignWorkspace(this);
+        }
+    }
 }
