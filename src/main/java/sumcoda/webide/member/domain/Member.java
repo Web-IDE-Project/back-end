@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.member.enumerate.Role;
+import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -45,6 +48,17 @@ public class Member {
     private Role role;
 
     // 하나의 유저는 여러가지 컨테이너 생성가능 1:N 양방향
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
+    private List<MemberWorkspace> memberWorkspaces;
 
+    // Member 1 <-> N MemberWorkspace
+    // 양방향 연관관계 편의 메서드
+    public void addMemberWorkspace(MemberWorkspace memberWorkspace) {
+        this.memberWorkspaces.add(memberWorkspace);
+
+        if (memberWorkspace.getMember() != this) {
+            memberWorkspace.assignMember(this);
+        }
+    }
 
 }
