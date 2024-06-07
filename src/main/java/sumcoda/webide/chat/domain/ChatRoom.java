@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.workspace.domain.Workspace;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -18,8 +20,12 @@ public class ChatRoom {
 
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "chatRoom")
+    @OneToOne(mappedBy = "chatRoom")
     private Workspace workspace;
+
+    // 양방향 연관관계
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom")
+    private List<ChatMessage> chatMessages;
 
     @Builder
     public ChatRoom(String name) {
