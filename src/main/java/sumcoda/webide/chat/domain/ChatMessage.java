@@ -1,9 +1,6 @@
 package sumcoda.webide.chat.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,9 +20,27 @@ public class ChatMessage {
 
     private MessageType messageType;
 
+    // 연관관계 주인
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
     @Builder
     public ChatMessage(String message, MessageType messageType) {
         this.message = message;
         this.messageType = messageType;
+    }
+
+    // ChatMessage N <-> 1 MembChatRoomer
+    // 양방향 연관관계 편의 메서드드
+    public void assignChatRoom(ChatRoom chatRoom) {
+        if (this.chatRoom != null) {
+            this.chatRoom.getChatMessages().remove(this);
+        }
+        this.chatRoom = chatRoom;
+
+        if (!chatRoom.getChatMessages().contains(this)) {
+            chatRoom.addChatMessage(this);
+        }
     }
 }

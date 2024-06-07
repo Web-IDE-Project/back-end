@@ -5,7 +5,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.workspace.domain.Workspace;
+
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,8 +21,12 @@ public class ChatRoom {
 
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "chatRoom")
+    @OneToOne(mappedBy = "chatRoom")
     private Workspace workspace;
+
+    // 양방향 연관관계
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom")
+    private List<ChatMessage> chatMessages;
 
     @Builder
     public ChatRoom(String name) {
@@ -35,6 +42,16 @@ public class ChatRoom {
         this.workspace = workspace;
         if (workspace != null && workspace.getChatRoom() != this) {
             workspace.assignChatRoom(this);
+        }
+    }
+
+    // ChatRoom 1 <-> N ChatMessage
+    // 양방향 연관관계 편의 메서드
+    public void addChatMessage(ChatMessage chatMessage) {
+        this.chatMessages.add(chatMessage);
+
+        if (chatMessage.getChatRoom() != this) {
+            chatMessage.assignChatRoom(this);
         }
     }
 }
