@@ -3,6 +3,7 @@ package sumcoda.webide.entry.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.workspace.domain.Workspace;
 
 import java.util.List;
 
@@ -30,4 +31,10 @@ public class Entry {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Entry> children;
+
+    // 연관관게 주인
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workspace_id")
+    private Workspace workspace;
+
 }

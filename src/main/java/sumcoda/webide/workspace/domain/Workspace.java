@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 
 import java.util.List;
@@ -35,8 +36,13 @@ public class Workspace {
     @Column(nullable = false)
     private Boolean status;
 
+    // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
     private List<MemberWorkspace> memberWorkspaces;
+
+    // 양방향 연관관계
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
+    private List<Entry> entries;
 
 
     @Builder
