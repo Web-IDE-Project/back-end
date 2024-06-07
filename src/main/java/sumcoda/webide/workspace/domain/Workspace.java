@@ -1,9 +1,11 @@
 package sumcoda.webide.workspace.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.chat.domain.ChatRoom;
 import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 
@@ -11,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Workspace {
 
     @Id
@@ -44,6 +46,13 @@ public class Workspace {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
     private List<Entry> entries;
 
+    // 연관관게 주인
+    // 양방향 연관관계
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
+
 
     @Builder
     public Workspace(String title, String category, String language, String content, Boolean status) {
@@ -71,6 +80,18 @@ public class Workspace {
 
         if (entry.getWorkspace() != this) {
             entry.assignWorkspace(this);
+        }
+    }
+
+    // Workspace 1 <-> 1 ChatRoom
+    // 양방향 연관관계 편의 메서드드
+    public void assignChatRoom(ChatRoom chatRoom) {
+        if (this.chatRoom != null) {
+            this.chatRoom.assignWorkspace(null);
+        }
+        this.chatRoom = chatRoom;
+        if (chatRoom != null && chatRoom.getWorkspace() != this) {
+            chatRoom.assignWorkspace(this);
         }
     }
 }
