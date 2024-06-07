@@ -1,13 +1,11 @@
 package sumcoda.webide.chat.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.workspace.domain.Workspace;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,6 +17,9 @@ public class ChatRoom {
     private Long id;
 
     private String name;
+
+    @OneToOne(mappedBy = "chatRoom")
+    private Workspace workspace;
 
     @Builder
     public ChatRoom(String name) {

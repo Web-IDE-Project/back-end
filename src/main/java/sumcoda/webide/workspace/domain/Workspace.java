@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.chat.domain.ChatRoom;
 import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 
@@ -43,6 +44,13 @@ public class Workspace {
     // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
     private List<Entry> entries;
+
+    // 연관관게 주인
+    // 양방향 연관관계
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
 
 
     @Builder
