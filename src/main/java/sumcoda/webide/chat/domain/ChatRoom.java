@@ -18,11 +18,23 @@ public class ChatRoom {
 
     private String name;
 
-    @OneToOne(mappedBy = "chatRoom")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "chatRoom")
     private Workspace workspace;
 
     @Builder
     public ChatRoom(String name) {
         this.name = name;
+    }
+
+    // ChatRoom 1 <-> 1 Workspace
+    // 양방향 연관관계 편의 메서드드
+    public void assignWorkspace(Workspace workspace) {
+        if (this.workspace != null) {
+            this.workspace.assignChatRoom(null);
+        }
+        this.workspace = workspace;
+        if (workspace != null && workspace.getChatRoom() != this) {
+            workspace.assignChatRoom(this);
+        }
     }
 }
