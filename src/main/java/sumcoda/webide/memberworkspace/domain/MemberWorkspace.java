@@ -22,16 +22,42 @@ public class MemberWorkspace {
     // admin, editor, viewer
     private String role;
 
+    // 해당 유저가 방에 참석한 시점
+    private LocalDateTime joinedAt;
+
+    // 연관관계 주인
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
+    // 연관관계 주인
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
-    // 해당 유저가 방에 참석한 시점
-    private LocalDateTime joinedAt;
+    // MemberWorkspace N <-> 1 Member
+    // 양방향 연관관계 편의 메서드드
+    public void assignMember(Member member) {
+        if (this.member != null) {
+            this.member.getMemberWorkspaces().remove(this);
+        }
+        this.member = member;
 
+        if (!member.getMemberWorkspaces().contains(this)) {
+            member.addMemberWorkspace(this);
+        }
+    }
 
+    // MemberWorkspace N <-> 1 Workspace
+    // 양방향 연관관계 편의 메서드드
+    public void assignWorkspace(Workspace workspace) {
+        if (this.workspace != null) {
+            this.workspace.getMemberWorkspaces().remove(this);
+        }
+        this.workspace = workspace;
+
+        if (!workspace.getMemberWorkspaces().contains(this)) {
+            workspace.addMemberWorkspace(this);
+        }
+    }
 }

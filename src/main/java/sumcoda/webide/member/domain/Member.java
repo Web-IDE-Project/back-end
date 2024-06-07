@@ -51,4 +51,14 @@ public class Member {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
     private List<MemberWorkspace> memberWorkspaces;
 
+    // Member 1 <-> N MemberWorkspace
+    // 양방향 연관관계 편의 메서드
+    public void addMemberWorkspace(MemberWorkspace memberWorkspace) {
+        this.memberWorkspaces.add(memberWorkspace);
+
+        if (memberWorkspace.getMember() != this) {
+            memberWorkspace.assignMember(this);
+        }
+    }
+
 }
