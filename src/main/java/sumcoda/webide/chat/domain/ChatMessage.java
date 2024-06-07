@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.chat.enumerate.MessageType;
+import sumcoda.webide.member.domain.Member;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,6 +26,11 @@ public class ChatMessage {
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
+    // 연관관계 주인
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Builder
     public ChatMessage(String message, MessageType messageType) {
         this.message = message;
@@ -42,5 +48,11 @@ public class ChatMessage {
         if (!chatRoom.getChatMessages().contains(this)) {
             chatRoom.addChatMessage(this);
         }
+    }
+
+    // ChatMessage N -> 1 Member
+    // 단방향 메서드
+    public void assignMember(Member member) {
+        this.member = member;
     }
 }
