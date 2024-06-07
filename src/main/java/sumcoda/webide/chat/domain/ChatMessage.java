@@ -49,4 +49,10 @@ public class ChatMessage {
             chatRoom.addChatMessage(this);
         }
     }
+
+    // ChatMessage N -> 1 Member
+    // 단방향 메서드
+    public void assignMember(Member member) {
+        this.member = member;
+    }
 }
