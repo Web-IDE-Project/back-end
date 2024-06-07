@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.workspace.domain.Workspace;
 
 import java.util.List;
@@ -41,6 +42,16 @@ public class ChatRoom {
         this.workspace = workspace;
         if (workspace != null && workspace.getChatRoom() != this) {
             workspace.assignChatRoom(this);
+        }
+    }
+
+    // ChatRoom 1 <-> N ChatMessage
+    // 양방향 연관관계 편의 메서드
+    public void addChatMessage(ChatMessage chatMessage) {
+        this.chatMessages.add(chatMessage);
+
+        if (chatMessage.getChatRoom() != this) {
+            chatMessage.assignChatRoom(this);
         }
     }
 }

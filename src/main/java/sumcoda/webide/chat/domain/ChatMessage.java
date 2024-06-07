@@ -30,4 +30,17 @@ public class ChatMessage {
         this.message = message;
         this.messageType = messageType;
     }
+
+    // ChatMessage N <-> 1 MembChatRoomer
+    // 양방향 연관관계 편의 메서드드
+    public void assignChatRoom(ChatRoom chatRoom) {
+        if (this.chatRoom != null) {
+            this.chatRoom.getChatMessages().remove(this);
+        }
+        this.chatRoom = chatRoom;
+
+        if (!chatRoom.getChatMessages().contains(this)) {
+            chatRoom.addChatMessage(this);
+        }
+    }
 }
