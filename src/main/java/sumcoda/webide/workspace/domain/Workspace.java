@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +34,9 @@ public class Workspace {
     // private인지 public 인지
     @Column(nullable = false)
     private Boolean status;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
+    private List<MemberWorkspace> memberWorkspaces;
 
 
     @Builder
