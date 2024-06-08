@@ -47,22 +47,19 @@ public class Workspace {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
     private List<Entry> entries = new ArrayList<>();
 
-    // 연관관게 주인
     // 양방향 연관관계
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "chat_room_id")
+    @OneToOne(mappedBy = "workspace")
     private ChatRoom chatRoom;
 
 
     // 빌더 패턴 생성자
     @Builder
-    public Workspace(String title, String category, String language, String content, Boolean status, ChatRoom chatRoom) {
+    public Workspace(String title, String category, String language, String content, Boolean status) {
         this.title = title;
         this.category = category;
         this.language = language;
         this.content = content;
         this.status = status;
-        this.assignChatRoom(chatRoom);
     }
 
     // Workspace 1 <-> N MemberWorkspace
