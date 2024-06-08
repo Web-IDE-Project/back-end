@@ -9,6 +9,7 @@ import sumcoda.webide.chat.domain.ChatRoom;
 import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,11 +41,11 @@ public class Workspace {
 
     // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
-    private List<MemberWorkspace> memberWorkspaces;
+    private List<MemberWorkspace> memberWorkspaces = new ArrayList<>();
 
     // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
-    private List<Entry> entries;
+    private List<Entry> entries = new ArrayList<>();
 
     // 연관관게 주인
     // 양방향 연관관계
@@ -53,14 +54,15 @@ public class Workspace {
     private ChatRoom chatRoom;
 
 
-
+    // 빌더 패턴 생성자
     @Builder
-    public Workspace(String title, String category, String language, String content, Boolean status) {
+    public Workspace(String title, String category, String language, String content, Boolean status, ChatRoom chatRoom) {
         this.title = title;
         this.category = category;
         this.language = language;
         this.content = content;
         this.status = status;
+        this.assignChatRoom(chatRoom);
     }
 
     // Workspace 1 <-> N MemberWorkspace

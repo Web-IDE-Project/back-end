@@ -2,6 +2,7 @@ package sumcoda.webide.memberworkspace.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.member.domain.Member;
@@ -34,6 +35,15 @@ public class MemberWorkspace {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
+
+    // 빌더 패턴 생성자
+    @Builder
+    public MemberWorkspace(String role, LocalDateTime joinedAt, Member member, Workspace workspace) {
+        this.role = role;
+        this.joinedAt = joinedAt;
+        this.assignMember(member);
+        this.assignWorkspace(workspace);
+    }
 
     // MemberWorkspace N <-> 1 Member
     // 양방향 연관관계 편의 메서드드
