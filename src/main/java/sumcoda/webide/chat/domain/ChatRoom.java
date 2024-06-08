@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.workspace.domain.Workspace;
 
 import java.util.List;
@@ -35,6 +36,14 @@ public class ChatRoom {
     public ChatRoom(String name, Workspace workspace) {
         this.name = name;
         this.assignWorkspace(workspace);
+    }
+
+    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
+    public static ChatRoom createChatRoom(String name, Workspace workspace) {
+        return ChatRoom.builder()
+                .name(name)
+                .workspace(workspace)
+                .build();
     }
 
     // ChatRoom 1 <-> 1 Workspace

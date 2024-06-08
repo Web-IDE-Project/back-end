@@ -51,6 +51,17 @@ public class Entry {
         this.assignWorkspace(workspace);
     }
 
+    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
+    public static Entry createEntry(String name, String content, Boolean isDirectory, Entry parent, Workspace workspace) {
+        return Entry.builder()
+                .name(name)
+                .content(content)
+                .isDirectory(isDirectory)
+                .parent(parent)
+                .workspace(workspace)
+                .build();
+    }
+
     // Entry N <-> 1 Workspace
     // 양방향 연관관계 편의 메서드
     public void assignWorkspace(Workspace workspace) {

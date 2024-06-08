@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.chat.domain.ChatRoom;
 import sumcoda.webide.entry.domain.Entry;
+import sumcoda.webide.member.domain.Member;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +62,17 @@ public class Workspace {
         this.language = language;
         this.content = content;
         this.status = status;
+    }
+
+    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
+    public static Workspace createWorkspace(String title, String category, String language, String content, Boolean status) {
+        return Workspace.builder()
+                .title(title)
+                .category(category)
+                .language(language)
+                .content(content)
+                .status(status)
+                .build();
     }
 
     // Workspace 1 <-> N MemberWorkspace

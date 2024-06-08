@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.chat.enumerate.MessageType;
 import sumcoda.webide.member.domain.Member;
+import sumcoda.webide.workspace.domain.Workspace;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,6 +38,16 @@ public class ChatMessage {
         this.messageType = messageType;
         this.assignChatRoom(chatRoom);
         this.assignMember(member);
+    }
+
+    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
+    public static ChatMessage createChatMessage(String message, MessageType messageType, ChatRoom chatRoom, Member member) {
+        return ChatMessage.builder()
+                .message(message)
+                .messageType(messageType)
+                .chatRoom(chatRoom)
+                .member(member)
+                .build();
     }
 
     // ChatMessage N <-> 1 MembChatRoomer
