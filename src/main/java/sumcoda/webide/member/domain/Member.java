@@ -65,6 +65,17 @@ public class Member {
         this.role = role;
     }
 
+    // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
+    public static Member createMember(String userId, String password, String nickname, String email, Role role) {
+        return Member.builder()
+                .userId(userId)
+                .password(password)
+                .nickname(nickname)
+                .email(email)
+                .role(role)
+                .build();
+    }
+
     // Member 1 <-> N MemberWorkspace
     // 양방향 연관관계 편의 메서드
     public void addMemberWorkspace(MemberWorkspace memberWorkspace) {
