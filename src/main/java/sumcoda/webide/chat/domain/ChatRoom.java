@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.workspace.domain.Workspace;
 
 import java.util.List;
@@ -19,6 +18,7 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     @OneToOne(mappedBy = "chatRoom")

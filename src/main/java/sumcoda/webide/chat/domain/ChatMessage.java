@@ -32,9 +32,11 @@ public class ChatMessage {
     private Member member;
 
     @Builder
-    public ChatMessage(String message, MessageType messageType) {
+    public ChatMessage(String message, MessageType messageType, ChatRoom chatRoom, Member member) {
         this.message = message;
         this.messageType = messageType;
+        this.assignChatRoom(chatRoom);
+        this.assignMember(member);
     }
 
     // ChatMessage N <-> 1 MembChatRoomer
