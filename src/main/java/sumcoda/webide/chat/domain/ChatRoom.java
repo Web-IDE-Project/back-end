@@ -21,7 +21,10 @@ public class ChatRoom {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "chatRoom")
+    // 연관관게 주인
+    // 양방향 연관관계
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "workspace_id")
     private Workspace workspace;
 
     // 양방향 연관관계
@@ -29,8 +32,9 @@ public class ChatRoom {
     private List<ChatMessage> chatMessages;
 
     @Builder
-    public ChatRoom(String name) {
+    public ChatRoom(String name, Workspace workspace) {
         this.name = name;
+        this.assignWorkspace(workspace);
     }
 
     // ChatRoom 1 <-> 1 Workspace
