@@ -42,8 +42,8 @@ public class RegisterController {
         } catch (Exception e) {
             e.printStackTrace();
             responseData.put("result", "error");
-            responseData.put("message", "이미 등록된 아이디 입니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+            responseData.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseData);
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
