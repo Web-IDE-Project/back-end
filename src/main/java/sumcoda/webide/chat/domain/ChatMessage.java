@@ -18,8 +18,11 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String message;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private MessageType messageType;
 
     // 연관관계 주인
