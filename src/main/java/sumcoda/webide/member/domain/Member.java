@@ -24,7 +24,7 @@ public class Member {
     // 소셜 로그인 = provider + " " + providerId
     // ex) naver asdf1234as93hf8932hf9ah2393hf9ah39fha9shd9fht
     @Column(nullable = false)
-    private String userId;
+    private String username;
 
     // 비밀번호
     // 일반 로그인 = 회원가입시 직접 설정해야함
@@ -57,8 +57,8 @@ public class Member {
 
     // 빌더 패턴 생성자
     @Builder
-    public Member(String userId, String password, String nickname, String email, Role role) {
-        this.userId = userId;
+    public Member(String username, String password, String nickname, String email, Role role) {
+        this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
@@ -66,9 +66,9 @@ public class Member {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member createMember(String userId, String password, String nickname, String email, Role role) {
+    public static Member createMember(String username, String password, String nickname, String email, Role role) {
         return Member.builder()
-                .userId(userId)
+                .username(username)
                 .password(password)
                 .nickname(nickname)
                 .email(email)
