@@ -24,7 +24,7 @@ public class RegisterController {
      *
      * @param registerRequestDTO 프론트로부터 전달받은 회원가입 정보
      **/
-    @PostMapping(value = "/api/auth/registerProc")
+    @PostMapping(value = "/api/auth/register")
     public ResponseEntity<?> registerProcess(@RequestBody RegisterRequestDTO registerRequestDTO) {
         log.info("register process is working");
 
