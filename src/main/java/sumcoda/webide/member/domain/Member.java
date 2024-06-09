@@ -47,7 +47,7 @@ public class Member {
 
     // 사용자의 권한을 나타내기위한 role
     // ex) ADMIN, USER
-    @Column
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 

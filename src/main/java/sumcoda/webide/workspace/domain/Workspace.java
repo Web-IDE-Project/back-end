@@ -7,10 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.chat.domain.ChatRoom;
 import sumcoda.webide.entry.domain.Entry;
-import sumcoda.webide.member.domain.Member;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
+import sumcoda.webide.workspace.enumerate.Category;
+import sumcoda.webide.workspace.enumerate.Language;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,17 +29,21 @@ public class Workspace {
 
     // 해당 컨테이너가 어떤 종류의 컨테이너인지
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     @Column(nullable = false)
-    private String language;
+    @Enumerated(EnumType.STRING)
+    private Language language;
+
+    private String description;
 
     @Column(nullable = false)
-    private String content;
+    private String rootName;
 
-    // private인지 public 인지
+    // private 인지 public 인지
     @Column(nullable = false)
-    private Boolean status;
+    private Boolean isPublic;
 
     // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
@@ -56,22 +60,24 @@ public class Workspace {
 
     // 빌더 패턴 생성자
     @Builder
-    public Workspace(String title, String category, String language, String content, Boolean status) {
+    public Workspace(String title, Category category, Language language, String description, String rootName, Boolean isPublic) {
         this.title = title;
         this.category = category;
         this.language = language;
-        this.content = content;
-        this.status = status;
+        this.description = description;
+        this.rootName = rootName;
+        this.isPublic = isPublic;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Workspace createWorkspace(String title, String category, String language, String content, Boolean status) {
+    public static Workspace createWorkspace(String title, Category category, Language language, String description, String rootName, Boolean isPublic) {
         return Workspace.builder()
                 .title(title)
                 .category(category)
                 .language(language)
-                .content(content)
-                .status(status)
+                .description(description)
+                .rootName(rootName)
+                .isPublic(isPublic)
                 .build();
     }
 
