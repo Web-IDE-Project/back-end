@@ -8,17 +8,24 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import sumcoda.webide.member.auth.RefreshTokenService;
 import sumcoda.webide.member.auth.filter.JWTFilter;
 import sumcoda.webide.member.auth.general.*;
 import sumcoda.webide.member.auth.util.JWTUtil;
 import sumcoda.webide.member.repository.MemberRepository;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -53,6 +60,21 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type"));
+        configuration.addAllowedHeader("Access-Control-Allow-Origin");
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenService);
@@ -64,6 +86,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .cors((corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource())))
+                // 보안 컨텍스트의 저장 방식을 제어하는 설정
+                // 보안 컨텍스트가 명시적으로 저장될 때만 저장되도록 한다.
+                // 보안 컨텍스트가 실수로 변경되거나 저장되는 것을 방지하여 보안성을 높인다.
+                .securityContext(securityContext -> securityContext
+                        .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers("/api/**").permitAll()
@@ -75,14 +103,23 @@ public class SecurityConfig {
                 .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(config -> config
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedHandler(customAccessDeniedHandler));
+                        .accessDeniedHandler(customAccessDeniedHandler))
+                // HTTP 응답 헤더를 설정한다.
+                // frameOptions 설정을 sameOrigin 으로 설정하여,
+                // 현재 페이지가 동일한 출처의 페이지에서만 포함될 수 있도록 한다.
+                .headers(
+                        headersConfigurer -> headersConfigurer
+                                .frameOptions(
+                                        HeadersConfigurer.FrameOptionsConfig::sameOrigin
+                                )
+                );
+
+
 
         // 스프링 시큐리티에서 기본적으로 등록되어있는 LogoutFilter 앞에 위치시켜 CustomLogoutFilter가 먼저 동작되도록 등록한다.
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenService), LogoutFilter.class);
 
-
-                //세션 설정
                 // jwt를 활용하는 방식은 세션을 STATELESS 방식을 활용하기 때문에 반드시 해당 코드를 작성
         http
                 .sessionManagement(session -> session
