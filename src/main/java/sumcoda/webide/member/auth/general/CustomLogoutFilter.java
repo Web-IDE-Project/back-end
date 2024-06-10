@@ -55,6 +55,10 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        response.setCharacterEncoding("UTF-8");
+
         // 로그아웃 요청이라면 쿠키에서 refresh 토큰을 가져온다.
         // 쿠키에서 Refresh Token 추출
         String refreshToken = CookieUtil.getRefreshTokenFromRequest(request);
@@ -64,6 +68,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             // 400 응답을 프론트측으로 전달한다.
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            responseData.put("message", "리프레시 토큰이 존재하지 않거나, 이미 로그아웃 되었습니다.");
+
+            objectMapper.writeValue(response.getWriter(), responseData);
             return;
         }
 
@@ -74,6 +81,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             // 그리고 해당 경우는 로그아웃이 이미 된 상태이기 때문에 400 응답을 프론트측으로 전달한다.
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            responseData.put("message", "이미 로그아웃 되었습니다.");
+
+            objectMapper.writeValue(response.getWriter(), responseData);
             return;
         }
 
@@ -83,6 +93,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            responseData.put("message", "유효하지 않은 리프레시 토큰이거나, 이미 로그아웃 되었습니다.");
+
+            objectMapper.writeValue(response.getWriter(), responseData);
             return;
         }
 
@@ -90,8 +103,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
         Boolean isExist = refreshTokenService.existsByRefresh(refreshToken);
         // 만약 DB에 해당 refresh 토큰이 저장되어있지 않다면,
         if (Boolean.FALSE.equals(isExist)) {
+
             // 이미 로그아웃이 된 상태이므로 프론트측에 400 응답을 전달한다.
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            responseData.put("message", "로그아웃에 성공하였습니다.");
+
+            objectMapper.writeValue(response.getWriter(), responseData);
             return;
         }
 
@@ -105,12 +122,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 이미 저장되어있는 쿠키의 키값과 동일한 비어있는 쿠키를 생성
         Cookie cookie = CookieUtil.createCookie("Refresh-Token", null, true);
 
-
         response.addCookie(cookie);
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        response.setCharacterEncoding("UTF-8");
 
         // 로그아웃이 완료되었다고 200응답을 프론트측에 전달한다.
         response.setStatus(HttpServletResponse.SC_OK);
