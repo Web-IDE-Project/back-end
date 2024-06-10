@@ -83,7 +83,7 @@ public class Entry {
         }
         this.parent = parent;
 
-        if (!parent.getChildren().contains(this)) {
+        if (parent != null && !parent.getChildren().contains(this)) {
             parent.addChild(this);
         }
     }
