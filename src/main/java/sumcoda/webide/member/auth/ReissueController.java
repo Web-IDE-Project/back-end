@@ -30,7 +30,7 @@ public class ReissueController {
         // 쿠키에서 Refresh Token 추출
         String refreshToken = CookieUtil.getRefreshTokenFromRequest(request);
 
-        //쿠키에서 refreshToken 토큰을 가져왔음에도 null일수도 있다.
+        // 쿠키에서 refreshToken 토큰을 가져왔음에도 null일수도 있다.
         if (refreshToken == null) {
 
             //프론트측으로 해당 메시지와 약속된 응답을 보낸다.
@@ -58,7 +58,7 @@ public class ReissueController {
         if (!category.equals("refresh")) {
 
             //해당 메시지와 약속된 응답을 보낸다.
-            responseData.put("message", "잘못된 리프레시 토큰입니다.");
+            responseData.put("message", "유효하지 않은 리프레시 토큰입니다.");
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
@@ -68,7 +68,7 @@ public class ReissueController {
         if (Boolean.FALSE.equals(isExist)) {
 
             //해당 메시지와 약속된 응답을 보낸다.
-            responseData.put("message", "잘못된 리프레시 토큰입니다.");
+            responseData.put("message", "존재하지 않는 리프레시 토큰입니다.");
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }

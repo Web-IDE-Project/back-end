@@ -81,7 +81,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             // 그리고 해당 경우는 로그아웃이 이미 된 상태이기 때문에 400 응답을 프론트측으로 전달한다.
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            responseData.put("message", "이미 로그아웃 되었습니다.");
+            responseData.put("message", "리프레시 토큰이 만료되었거나, 이미 로그아웃 되었습니다.");
 
             objectMapper.writeValue(response.getWriter(), responseData);
             return;
@@ -106,7 +106,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             // 이미 로그아웃이 된 상태이므로 프론트측에 400 응답을 전달한다.
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            responseData.put("message", "로그아웃에 성공하였습니다.");
+            responseData.put("message", "이미 로그아웃 되었습니다.");
 
             objectMapper.writeValue(response.getWriter(), responseData);
             return;
