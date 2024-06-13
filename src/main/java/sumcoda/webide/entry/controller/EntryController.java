@@ -52,4 +52,18 @@ public class EntryController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 파일 내용 조회
+    @GetMapping("/{containerId}/files/{fileId}")
+    public ResponseEntity<EntryGetResponseDTO> getFile(
+            @PathVariable Long containerId,
+            @PathVariable Long fileId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        EntryGetResponseDTO response = entryService.getFile(containerId, fileId, username);
+
+        return ResponseEntity.ok(response);
+    }
 }

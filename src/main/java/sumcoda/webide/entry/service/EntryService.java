@@ -90,6 +90,30 @@ public class EntryService {
         // entryRepository.save(file); 호출 없이도 트랜잭션이 커밋될 때 변경 사항이 반영됨.(dirty checking)
     }
 
+    // 파일 내용 조회
+    public EntryGetResponseDTO getFile(Long containerId, Long fileId, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = findWorkspaceById(containerId);
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 워크스페이스 안에 엔트리가 존재하는지 확인
+        Entry file = entryRepository.findByWorkspaceIdAndEntryId(containerId, fileId)
+                .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 파일 Id 입니다.: " + fileId));
+
+        // 엔트리가 파일인지 확인
+        if (file.getIsDirectory()) {
+            throw new EntryAccessException("디렉토리는 내용을 조회할 수 없습니다.");
+        }
+
+        // 응답 DTO 생성 및 반환
+        return EntryGetResponseDTO.builder()
+                .content(file.getContent())
+                .build();
+    }
+
     // 공통 메서드
 
     // 워크스페이스가 존재하는지 확인
