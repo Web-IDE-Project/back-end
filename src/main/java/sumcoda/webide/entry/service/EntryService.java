@@ -110,4 +110,36 @@ public class EntryService {
             throw new WorkspaceAccessException("유저는 워크스페이스에 접근 권한이 없습니다.: " + username);
         }
     }
+
+    // 디렉토리 이름 수정
+    public void renameDirectory(Long containerId, Long directoryId, EntryRenameRequestDTO entryRenameRequestDTO, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = findWorkspaceById(containerId);
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 워크스페이스 안에 엔트리가 존재하는지 확인
+        Entry directory = entryRepository.findByWorkspaceIdAndEntryId(containerId, directoryId)
+                .orElseThrow(() -> new EntryFoundException("존재하지 않는 디렉토리 Id 입니다.: " + directoryId));
+
+        // 엔트리가 디렉토리인지 확인
+        if (!directory.getIsDirectory()) {
+            throw new EntryAccessException("파일 이름 수정 요청이 아닌 디렉토리 이름 수정 요청입니다.");
+        }
+
+        // 최상위 디렉토리인지 확인
+        if (directory.getParent() == null) {
+            throw new RootEntryDeleteException("최상위 디렉토리는 수정할 수 없습니다.");
+        }
+
+        // 디렉토리 안에 같은 이름의 디렉토리가 존재하는지 확인
+        if (entryRepository.findByEntryAndName(directory.getParent(), entryRenameRequestDTO.getName()).isPresent()) {
+            throw new EntryAlreadyExistsException("같은 이름의 디렉토리가 이미 존재합니다.: " + entryRenameRequestDTO.getName());
+        }
+
+        // 디렉토리 이름 업데이트
+        directory.updateName(entryRenameRequestDTO.getName());
+    }
 }

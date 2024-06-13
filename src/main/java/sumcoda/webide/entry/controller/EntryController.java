@@ -49,4 +49,22 @@ public class EntryController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 디렉토리 이름 수정
+    @PutMapping("/{containerId}/directories/{directoryId}/rename")
+    public ResponseEntity<Map<String, String>> renameDirectory(
+            @PathVariable Long containerId,
+            @PathVariable Long directoryId,
+            @RequestBody EntryRenameRequestDTO entryRenameRequestDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        entryService.renameDirectory(containerId, directoryId, entryRenameRequestDTO, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "디렉토리 이름이 수정되었습니다.");
+
+        return ResponseEntity.ok(response);
+    }
 }
