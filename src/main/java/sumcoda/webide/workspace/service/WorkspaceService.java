@@ -3,6 +3,8 @@ package sumcoda.webide.workspace.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sumcoda.webide.entry.domain.Entry;
+import sumcoda.webide.entry.repository.EntryRepository;
 import sumcoda.webide.member.domain.Member;
 import sumcoda.webide.member.repository.MemberRepository;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
@@ -24,6 +26,7 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final MemberRepository memberRepository;
     private final MemberWorkspaceRepository memberWorkspaceRepository;
+    private final EntryRepository entryRepository;
 
     /**
      * 워크스페이스 생성 요청 캐치
@@ -56,5 +59,40 @@ public class WorkspaceService {
                 workspace
         );
         memberWorkspaceRepository.save(memberWorkspace);
+
+        //최상위 디렉토리 생성 및 저장
+        Entry rootDirectory = Entry.createEntry(
+                "WORKSPACE-" + UUID.randomUUID().toString(),
+                null,
+                true,
+                null,
+                workspace
+        );
+        entryRepository.save(rootDirectory);
+
+        //기본 템플릿 파일 생성 및 저장
+        String templateContent = String.format(sumcoda.webide.workspace.template.BasicTemplate.getTemplate(workspaceCreateRequestDTO.getLanguage().toString()), "Hello, World!");
+        if (templateContent != null) {
+            Entry templateFile = Entry.createEntry(
+                    getTemplateFileName(workspaceCreateRequestDTO.getLanguage().toString()),
+                    templateContent,
+                    false,
+                    rootDirectory,
+                    workspace
+            );
+            entryRepository.save(templateFile);
+        }
+    }
+
+    //기본 템플릿 파일 이름 설정
+    private String getTemplateFileName (String language) {
+        return switch (language) {
+            case "C" -> "main.c";
+            case "CPP" -> "main.cpp";
+            case "JAVA" -> "Main.java";
+            case "JAVASCRIPT" -> "main.js";
+            case "PYTHON" -> "main.py";
+            default -> "main.txt";
+        };
     }
 }
