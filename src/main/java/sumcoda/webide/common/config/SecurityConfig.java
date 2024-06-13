@@ -26,6 +26,9 @@ import sumcoda.webide.member.auth.general.CustomAuthenticationFailureHandler;
 import sumcoda.webide.member.auth.general.CustomAuthenticationFilter;
 import sumcoda.webide.member.auth.general.CustomAuthenticationSuccessHandler;
 import sumcoda.webide.member.auth.general.CustomLogoutSuccessHandler;
+import sumcoda.webide.member.auth.social.CustomOAuth2UserService;
+import sumcoda.webide.member.auth.social.OAuth2AuthenticationFailureHandler;
+import sumcoda.webide.member.auth.social.OAuth2AuthenticationSuccessHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +50,14 @@ public class SecurityConfig {
 
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+
+
+
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -61,7 +72,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type"));
         configuration.addAllowedHeader("Access-Control-Allow-Origin");
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Authorization_Refresh"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -101,6 +112,20 @@ public class SecurityConfig {
                                         HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                 )
                 );
+
+        // oauth2 소셜 로그인 구현 코드
+        http
+                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage("/auth/login")
+                        .authorizationEndpoint(oAuth2 -> oAuth2
+                                .baseUri("/api/oauth2/authorization"))
+                        .redirectionEndpoint(oAuth2 -> oAuth2
+                                .baseUri("/login/oauth2/code/**"))
+                        .userInfoEndpoint(userInfoEndpointConfig ->
+                                userInfoEndpointConfig
+                                        .userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler));
 
         http.logout(auth -> auth
                 .logoutUrl("/api/auth/logout")
