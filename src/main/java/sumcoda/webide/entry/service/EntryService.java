@@ -136,6 +136,33 @@ public class EntryService {
         entryRepository.delete(file);
     }
 
+    // 파일 이름 수정
+    public void renameFile(Long containerId, Long fileId, EntryRenameRequestDTO entryRenameRequestDTO, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = findWorkspaceById(containerId);
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 워크스페이스 안에 엔트리가 존재하는지 확인
+        Entry file = entryRepository.findByWorkspaceIdAndEntryId(containerId, fileId)
+                .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 파일 Id 입니다.: " + fileId));
+
+        // 엔트리가 파일인지 확인
+        if (file.getIsDirectory()) {
+            throw new EntryAccessException("디렉토리 이름 수정 요청이 아닌 파일 이름 수정 요청입니다.");
+        }
+
+        // 디렉토리 안에 같은 이름의 파일이 존재하는지 확인
+        if (entryRepository.findByEntryAndName(file.getParent(), entryRenameRequestDTO.getName()).isPresent()) {
+            throw new EntryAlreadyExistsException("같은 이름의 파일이 이미 존재합니다.: " + entryRenameRequestDTO.getName());
+        }
+
+        // 파일 이름 업데이트
+        file.updateName(entryRenameRequestDTO.getName());
+    }
+
     // 공통 메서드
 
     // 워크스페이스가 존재하는지 확인

@@ -101,4 +101,9 @@ public class Entry {
     public void updateContent(String content) {
         this.content = content;
     }
+
+    // 엔트리 이름 업데이트 메서드
+    public void updateName(String newName) {
+        this.name = newName;
+    }
 }

@@ -82,4 +82,22 @@ public class EntryController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 파일 이름 수정
+    @PutMapping("/{containerId}/files/{fileId}/rename")
+    public ResponseEntity<Map<String, String>> renameFile(
+            @PathVariable Long containerId,
+            @PathVariable Long fileId,
+            @RequestBody EntryRenameRequestDTO entryRenameRequestDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        entryService.renameFile(containerId, fileId, entryRenameRequestDTO, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "파일 이름이 수정되었습니다.");
+
+        return ResponseEntity.ok(response);
+    }
 }
