@@ -18,7 +18,6 @@ import sumcoda.webide.workspace.repository.WorkspaceRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -110,11 +109,10 @@ public class WorkspaceService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new sumcoda.webide.workspace.exception.WorkspaceNotFoundException("존재하지 않는 워크스페이스입니다."));
 
-        List<Entry> entries = workspace.getEntries().stream()
-                //최상위 디렉토리 제외
-                .filter(entry -> entry.getParent() != null)
-                .collect(Collectors.toList());
+        //워크스페이스에 속한 엔트리 가져오기
+        List<Entry> entries = workspace.getEntries();
 
+        //엔트리들을 DTO로 변환하여 반환
         return WorkspaceResponseDTO.fromEntries(entries);
     }
 }
