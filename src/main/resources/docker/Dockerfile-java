@@ -1,0 +1,8 @@
+# 실행할 도커 이미지 이름
+FROM openjdk:latest
+
+# 도커 컨테이너 내부에서 컴파일을 진행할 디렉토리
+WORKDIR /usr/src/myapp
+
+# 컨테이너가 동작하면 실행할 코드
+CMD ["sh", "-c", "javac Main.java && java Main"]
