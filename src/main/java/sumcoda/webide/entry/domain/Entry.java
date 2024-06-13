@@ -97,4 +97,8 @@ public class Entry {
         }
     }
 
+    // 파일 내용 업데이트 메서드
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

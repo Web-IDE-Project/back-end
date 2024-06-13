@@ -34,4 +34,22 @@ public class EntryController {
         EntryCreateResponseDTO response = entryService.createFile(containerId, directoryId, entryCreateRequestDTO, username);
         return ResponseEntity.ok(response);
     }
+
+    // 파일 저장
+    @PutMapping("/{containerId}/files/{fileId}")
+    public ResponseEntity<Map<String, String>> saveFile(
+            @PathVariable Long containerId,
+            @PathVariable Long fileId,
+            @RequestBody EntrySaveRequestDTO entrySaveRequestDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        entryService.saveFile(containerId, fileId, entrySaveRequestDTO, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "파일 저장에 성공하였습니다.");
+
+        return ResponseEntity.ok(response);
+    }
 }
