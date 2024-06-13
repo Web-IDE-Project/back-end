@@ -13,16 +13,22 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import sumcoda.webide.member.auth.RefreshTokenService;
-import sumcoda.webide.member.auth.filter.JWTFilter;
-import sumcoda.webide.member.auth.general.*;
-import sumcoda.webide.member.auth.util.JWTUtil;
-import sumcoda.webide.member.repository.MemberRepository;
+import sumcoda.webide.member.auth.CustomAccessDeniedHandler;
+import sumcoda.webide.member.auth.CustomAuthenticationEntryPoint;
+import sumcoda.webide.member.auth.general.CustomAuthenticationFailureHandler;
+import sumcoda.webide.member.auth.general.CustomAuthenticationFilter;
+import sumcoda.webide.member.auth.general.CustomAuthenticationSuccessHandler;
+import sumcoda.webide.member.auth.general.CustomLogoutSuccessHandler;
+import sumcoda.webide.member.auth.social.CustomOAuth2UserService;
+import sumcoda.webide.member.auth.social.OAuth2AuthenticationFailureHandler;
+import sumcoda.webide.member.auth.social.OAuth2AuthenticationSuccessHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,28 +38,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+
     // AuthenticationManager 를 반환받기위해 필요한 AuthenticationConfiguration 인스턴스 주입
+
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    private final JWTUtil jwtUtil;
-
-    private final MemberRepository memberRepository;
-
-    private final RefreshTokenService refreshTokenService;
-
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
 
 
 
-    // AuthenticationManager 를 반환하는 메서드 등록
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -68,7 +72,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type"));
         configuration.addAllowedHeader("Access-Control-Allow-Origin");
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Authorization_Refresh"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -77,9 +81,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenService);
-        customAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
-
 
         // 새로추가
         http
@@ -94,13 +95,11 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/api/**").permitAll()
-                        .anyRequest().authenticated());
-        http.
-                addFilterBefore(new JWTFilter(jwtUtil, memberRepository), CustomAuthenticationFilter.class);
+                        .requestMatchers("/api/**", "/oauth2/authorization/**").permitAll()
+                        .anyRequest().authenticated())
 
-        http
-                .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        // 추가 코드
+                .addFilterAt(ajaxAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(config -> config
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
@@ -114,18 +113,69 @@ public class SecurityConfig {
                                 )
                 );
 
-
-
-        // 스프링 시큐리티에서 기본적으로 등록되어있는 LogoutFilter 앞에 위치시켜 CustomLogoutFilter가 먼저 동작되도록 등록한다.
+        // oauth2 소셜 로그인 구현 코드
         http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenService), LogoutFilter.class);
+                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage("/auth/login")
+                        .authorizationEndpoint(oAuth2 -> oAuth2
+                                .baseUri("/api/oauth2/authorization"))
+                        .redirectionEndpoint(oAuth2 -> oAuth2
+                                .baseUri("/login/oauth2/code/**"))
+                        .userInfoEndpoint(userInfoEndpointConfig ->
+                                userInfoEndpointConfig
+                                        .userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler));
 
-                // jwt를 활용하는 방식은 세션을 STATELESS 방식을 활용하기 때문에 반드시 해당 코드를 작성
+        http.logout(auth -> auth
+                .logoutUrl("/api/auth/logout")
+                .logoutSuccessHandler(customLogoutSuccessHandler)
+                .deleteCookies("JSESSIONID", "remember-me", "Refresh-Token"));
+
+
+        http    // 하나의 아이디에 대해서 다중 로그인에 대한 처리
+                .sessionManagement(auth -> auth
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true));
+
         http
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(auth -> auth
+                        .sessionFixation()
+                        .changeSessionId());
+
+        http
+                .sessionManagement(auth -> auth
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
+                .rememberMe(auth -> auth
+                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
+                        .tokenValiditySeconds(86400));
 
         return http.build();
 
     }
+
+    // 새로추가
+    @Bean
+    public CustomAuthenticationFilter ajaxAuthenticationFilter() throws Exception {
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
+        customAuthenticationFilter.setAuthenticationManager(authenticationManager());
+        customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
+        customAuthenticationFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
+
+        customAuthenticationFilter.setSecurityContextRepository(
+                new DelegatingSecurityContextRepository(
+                        new HttpSessionSecurityContextRepository(),
+                        new RequestAttributeSecurityContextRepository()
+                ));
+
+        return customAuthenticationFilter;
+    }
+
+    // AuthenticationManager 를 반환하는 메서드 등록
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
 }

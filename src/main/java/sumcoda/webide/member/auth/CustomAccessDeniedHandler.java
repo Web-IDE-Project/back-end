@@ -1,4 +1,4 @@
-package sumcoda.webide.member.auth.general;
+package sumcoda.webide.member.auth;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
