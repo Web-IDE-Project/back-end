@@ -97,4 +97,8 @@ public class Entry {
         }
     }
 
+    // 엔트리 이름 업데이트 메서드
+    public void updateName(String newName) {
+        this.name = newName;
+    }
 }
