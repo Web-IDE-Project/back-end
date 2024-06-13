@@ -48,4 +48,18 @@ public class EntryExceptionHandler {
         response.put("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(EntryAccessException.class)
+    public ResponseEntity<Map<String, Object>> EntryAccessExceptionHandler(EntryAccessException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RootEntryDeleteException.class)
+    public ResponseEntity<Map<String, Object>> RootEntryDeleteExceptionHandler(RootEntryDeleteException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }
