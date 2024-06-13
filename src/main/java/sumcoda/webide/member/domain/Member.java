@@ -86,4 +86,7 @@ public class Member {
         }
     }
 
+    public void assignEmail(String email) {
+        this.email = email;
+    }
 }
