@@ -114,6 +114,28 @@ public class EntryService {
                 .build();
     }
 
+    // 파일 삭제
+    public void deleteFile(Long containerId, Long fileId, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = findWorkspaceById(containerId);
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 워크스페이스 안에 엔트리가 존재하는지 확인
+        Entry file = entryRepository.findByWorkspaceIdAndEntryId(containerId, fileId)
+                .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 파일 Id 입니다.: " + fileId));
+
+        // 엔트리가 파일인지 확인
+        if (file.getIsDirectory()) {
+            throw new EntryAccessException("디렉토리 삭제 요청이 아닌 파일 삭제 요청입니다.");
+        }
+
+        // 파일 삭제
+        entryRepository.delete(file);
+    }
+
     // 공통 메서드
 
     // 워크스페이스가 존재하는지 확인

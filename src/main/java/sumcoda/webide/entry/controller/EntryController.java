@@ -66,4 +66,20 @@ public class EntryController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 파일 삭제
+    @DeleteMapping("/{containerId}/files/{fileId}")
+    public ResponseEntity<Map<String, String>> deleteFile(
+            @PathVariable Long containerId,
+            @PathVariable Long fileId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        entryService.deleteFile(containerId, fileId, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "파일 삭제에 성공하였습니다.");
+
+        return ResponseEntity.ok(response);
+    }
 }
