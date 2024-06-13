@@ -65,6 +65,33 @@ public class EntryService {
                 .build();
     }
 
+    // 디렉토리 삭제
+    public void deleteDirectory(Long containerId, Long directoryId, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = findWorkspaceById(containerId);
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 워크스페이스 안에 엔트리가 존재하는지 확인
+        Entry directory = entryRepository.findByWorkspaceIdAndEntryId(containerId, directoryId)
+                .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 디렉토리 Id 입니다.: " + directoryId));
+
+        // 엔트리가 디렉토리인지 확인
+        if (!directory.getIsDirectory()) {
+            throw new EntryAccessException("파일 삭제 요청이 아닌 디렉토리 삭제 요청입니다.");
+        }
+
+        // 최상위 디렉토리인지 확인
+        if (directory.getParent() == null) {
+            throw new RootEntryDeleteException("최상위 디렉토리는 삭제할 수 없습니다.");
+        }
+
+        // 디렉토리 삭제
+        entryRepository.delete(directory);
+    }
+
     // 공통 메서드
 
     // 워크스페이스가 존재하는지 확인

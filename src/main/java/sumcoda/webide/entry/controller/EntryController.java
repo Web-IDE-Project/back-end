@@ -33,4 +33,20 @@ public class EntryController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 디렉토리 삭제
+    @DeleteMapping("/{containerId}/directories/{directoryId}")
+    public ResponseEntity<Map<String, String>> deleteDirectory(
+            @PathVariable Long containerId,
+            @PathVariable Long directoryId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        entryService.deleteDirectory(containerId, directoryId, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "디렉토리 삭제에 성공하였습니다.");
+
+        return ResponseEntity.ok(response);
+    }
 }
