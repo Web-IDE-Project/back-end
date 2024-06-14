@@ -8,14 +8,19 @@ import sumcoda.webide.entry.repository.EntryRepository;
 import sumcoda.webide.member.domain.Member;
 import sumcoda.webide.member.repository.MemberRepository;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
+import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
 import sumcoda.webide.memberworkspace.repository.MemberWorkspaceRepository;
 import sumcoda.webide.workspace.domain.Workspace;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
+import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
+import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +53,7 @@ public class WorkspaceService {
         //Category 값과 isPublic 값은 디폴트 값으로 저장
         Workspace workspace = Workspace.createWorkspace(
                 workspaceCreateRequestDTO.getTitle(),
-                Category.MY,
+                new HashSet<>(Arrays.asList(Category.MY, Category.QUESTION)),
                 workspaceCreateRequestDTO.getLanguage(),
                 workspaceCreateRequestDTO.getDescription(),
                 "WORKSPACE-" + UUID.randomUUID().toString(),
@@ -59,7 +64,7 @@ public class WorkspaceService {
 
         //MemberWorkspace 생성 및 저장
         MemberWorkspace memberWorkspace = MemberWorkspace.createMemberWorkspace(
-                null,
+                MemberWorkspaceRole.ADMIN,
                 LocalDateTime.now(),
                 member,
                 workspace
@@ -91,17 +96,7 @@ public class WorkspaceService {
         entryRepository.save(templateFile);
     }
 
-    //기본 템플릿 파일 이름 설정
-    private String getTemplateFileName(String language) {
-        return switch (language) {
-            case "C" -> "main.c";
-            case "CPP" -> "main.cpp";
-            case "JAVA" -> "Main.java";
-            case "JAVASCRIPT" -> "main.js";
-            case "PYTHON" -> "main.py";
-            default -> "main.txt";
-        };
-    }
+
 
     /**
      * 워크스페이스 실행 요청 캐치
@@ -113,5 +108,32 @@ public class WorkspaceService {
 
         //엔트리를 DTO로 변환하여 반환
         return workspaceRepository.findAllEntriesByWorkspaceId(workspaceId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkspaceResponseDTO> getWorkspacesByCategory(Category category) {
+        List<WorkspaceResponseDAO> workspaceResponseDAOList = workspaceRepository.findWorkspacesByCategory(category);
+
+        return workspaceResponseDAOList.stream()
+                .map(data -> WorkspaceResponseDTO.builder()
+                        .id(data.getId())
+                        .title(data.getTitle())
+                        .language(data.getLanguage().getValue())
+                        .description(data.getDescription())
+                        .nickname(category == Category.MY ? null : data.getNickname())
+                        .build())
+                .toList();
+    }
+
+    //기본 템플릿 파일 이름 설정
+    private String getTemplateFileName(String language) {
+        return switch (language) {
+            case "C" -> "main.c";
+            case "CPP" -> "main.cpp";
+            case "JAVA" -> "Main.java";
+            case "JAVASCRIPT" -> "main.js";
+            case "PYTHON" -> "main.py";
+            default -> "main.txt";
+        };
     }
 }

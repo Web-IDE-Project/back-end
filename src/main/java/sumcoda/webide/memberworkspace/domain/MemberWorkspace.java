@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.member.domain.Member;
-import sumcoda.webide.member.enumerate.Role;
+import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
 import sumcoda.webide.workspace.domain.Workspace;
 
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class MemberWorkspace {
 
     // 방에 참서한 유저의 역할
     // admin, editor, viewer
-    private String role;
+    private MemberWorkspaceRole role;
 
     // 해당 유저가 방에 참석한 시점
     private LocalDateTime joinedAt;
@@ -39,7 +39,7 @@ public class MemberWorkspace {
 
     // 빌더 패턴 생성자
     @Builder
-    public MemberWorkspace(String role, LocalDateTime joinedAt, Member member, Workspace workspace) {
+    public MemberWorkspace(MemberWorkspaceRole role, LocalDateTime joinedAt, Member member, Workspace workspace) {
         this.role = role;
         this.joinedAt = joinedAt;
         this.assignMember(member);
@@ -47,7 +47,7 @@ public class MemberWorkspace {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static MemberWorkspace createMemberWorkspace(String role, LocalDateTime joinedAt, Member member, Workspace workspace) {
+    public static MemberWorkspace createMemberWorkspace(MemberWorkspaceRole role, LocalDateTime joinedAt, Member member, Workspace workspace) {
         return MemberWorkspace.builder()
                 .role(role)
                 .joinedAt(joinedAt)
