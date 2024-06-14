@@ -103,36 +103,43 @@ public class EntryService {
         return workspaceRepository.findAllEntriesByWorkspaceId(workspaceId);
     }
 
-    // 디렉토리 이름 수정
-    public void renameDirectory(Long containerId, Long directoryId, EntryRenameRequestDTO entryRenameRequestDTO, String username) {
+    // 엔트리 이름 수정
+    @Transactional
+    public void renameEntry(Long workspaceId, Long entryId, EntryRenameRequestDTO entryRenameRequestDTO, String username) {
+
+        String newName = entryRenameRequestDTO.getName();
+        boolean isDirectory = entryRenameRequestDTO.getIsDirectory();
 
         // 워크스페이스가 존재하는지 확인
-        Workspace workspace = findWorkspaceById(containerId);
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
 
         // 유저가 워크스페이스에 권한이 존재하는지 확인
         checkUserAccessToWorkspace(workspace, username);
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
-        Entry directory = entryRepository.findByWorkspaceIdAndEntryId(containerId, directoryId)
-                .orElseThrow(() -> new EntryFoundException("존재하지 않는 디렉토리 Id 입니다.: " + directoryId));
+        Entry entry = entryRepository.findByWorkspaceIdAndId(workspaceId, entryId)
+                .orElseThrow(() -> new EntryFoundException("존재하지 않는 엔트리 Id 입니다.: " + entryId));
 
-        // 엔트리가 디렉토리인지 확인
-        if (!directory.getIsDirectory()) {
-            throw new EntryAccessException("파일 이름 수정 요청이 아닌 디렉토리 이름 수정 요청입니다.");
+        // 파일 또는 디렉토리 이름의 형식 검증
+        if (newName.contains(".") && !isDirectory) {
+            throw new EntryAccessException("디렉토리 이름에는 '.' 문자가 포함될 수 없습니다.");
+        } else if (!newName.contains(".") && isDirectory) {
+            throw new EntryAccessException("파일 이름에는 '.' 문자가 포함되어야 합니다.");
         }
 
         // 최상위 디렉토리인지 확인
-        if (directory.getParent() == null) {
+        if (entry.getParent() == null) {
             throw new RootEntryDeleteException("최상위 디렉토리는 수정할 수 없습니다.");
         }
 
-        // 디렉토리 안에 같은 이름의 디렉토리가 존재하는지 확인
-        if (entryRepository.findByEntryAndName(directory.getParent(), entryRenameRequestDTO.getName()).isPresent()) {
-            throw new EntryAlreadyExistsException("같은 이름의 디렉토리가 이미 존재합니다.: " + entryRenameRequestDTO.getName());
+        // 디렉토리 안에 같은 이름의 엔트리가 존재하는지 확인
+        if (entryRepository.findByParentAndName(entry.getParent(), newName).isPresent()) {
+            throw new EntryAlreadyExistsException("같은 이름의 엔트리가 이미 존재합니다.: " + newName);
         }
 
         // 디렉토리 이름 업데이트
-        directory.updateName(entryRenameRequestDTO.getName());
+        entry.updateName(newName);
     }
 
     // 공통 메서드

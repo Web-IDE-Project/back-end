@@ -73,20 +73,30 @@ public class EntryController {
         return ResponseEntity.ok(response);
     }
 
-    // 디렉토리 이름 수정
-    @PutMapping("/{containerId}/directories/{directoryId}/rename")
-    public ResponseEntity<Map<String, String>> renameDirectory(
-            @PathVariable Long containerId,
-            @PathVariable Long directoryId,
-            @RequestBody EntryRenameRequestDTO entryRenameRequestDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
+    // 엔트리 이름 수정
+    @PutMapping("/{workspaceId}/entries/{entryId}/rename")
+    public ResponseEntity<Map<String, String>> renameEntry(
+            @PathVariable Long workspaceId,
+            @PathVariable Long entryId,
+            @RequestBody EntryRenameRequestDTO entryRenameRequestDTO,
+            Authentication authentication) {
 
-        entryService.renameDirectory(containerId, directoryId, entryRenameRequestDTO, username);
+        String username = "";
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
+
+        entryService.renameEntry(workspaceId, entryId, entryRenameRequestDTO, username);
 
         Map<String, String> response = new HashMap<>();
-        response.put("message", "디렉토리 이름이 수정되었습니다.");
+        response.put("message", "이름이 수정되었습니다.");
 
         return ResponseEntity.ok(response);
     }
