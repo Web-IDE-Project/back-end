@@ -5,11 +5,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import sumcoda.webide.member.auth.social.CustomOAuth2User;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
+import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
+import sumcoda.webide.workspace.exception.WorkspaceFoundException;
 import sumcoda.webide.workspace.service.WorkspaceService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -34,9 +39,16 @@ public class WorkspaceController {
 
         String username;
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        username = userDetails.getUsername();
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
 
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
         Map<String, Object> responseData = new HashMap<>();
         try {
             workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
@@ -49,5 +61,28 @@ public class WorkspaceController {
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+    }
+
+    /**
+     * 워크스페이스 실행 시 엔트리 목록 반환하는 메서드
+     *
+     * @param workspaceId    워크스페이스 ID
+     * @param authentication 인증 정보
+     */
+    @PostMapping("/{workspaceId}")
+    public ResponseEntity<?> executeWorkspace(
+            @PathVariable Long workspaceId,
+            Authentication authentication) {
+
+        Map<String, Object> responseData = new HashMap<>();
+        try {
+            //워크스페이스 실행 서비스 호출
+            List<WorkspaceResponseDTO> workspaceEntries = workspaceService.executeWorkspace(workspaceId);
+            return ResponseEntity.status(HttpStatus.OK).body(workspaceEntries);
+        } catch (WorkspaceFoundException e) {
+            responseData.put("result", "error");
+            responseData.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }
     }
 }
