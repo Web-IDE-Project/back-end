@@ -1,6 +1,7 @@
 package sumcoda.webide.workspace.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
+import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
+import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.exception.WorkspaceFoundException;
 import sumcoda.webide.workspace.service.WorkspaceService;
 
@@ -17,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/workspaces")
@@ -84,5 +88,25 @@ public class WorkspaceController {
             responseData.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
         }
+    }
+
+    @GetMapping("/{category}")
+    public ResponseEntity<?> getWorkspacesByCategory(@PathVariable Category category) {
+
+        Map<String, Object> responseData = new HashMap<>();
+        log.info(category.getValue());
+
+        try {
+            List<WorkspaceResponseDTO> workspacesByCategory = workspaceService.getWorkspacesByCategory(category);
+            responseData.put("message", category.getValue() + " 워크스페이스를 성공적으로 조회했습니다.");
+            responseData.put("result", workspacesByCategory);
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.put("message", category.getValue() + " 워크스페이스를 조회할 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        }
+
     }
 }
