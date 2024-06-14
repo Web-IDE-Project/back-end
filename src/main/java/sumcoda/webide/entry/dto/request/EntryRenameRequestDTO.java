@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EntryRenameRequestDTO {
     private String name;
+    private Boolean isDirectory;
 
     @Builder
-    public EntryRenameRequestDTO(String name) {
+    public EntryRenameRequestDTO(String name, Boolean isDirectory) {
         this.name = name;
+        this.isDirectory = isDirectory;
     }
 }
