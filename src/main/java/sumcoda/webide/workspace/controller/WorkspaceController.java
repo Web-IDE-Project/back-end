@@ -69,7 +69,7 @@ public class WorkspaceController {
      * @param workspaceId    워크스페이스 ID
      * @param authentication 인증 정보
      */
-    @PostMapping("/{workspaceId}")
+    @GetMapping("/{workspaceId}")
     public ResponseEntity<?> executeWorkspace(
             @PathVariable Long workspaceId,
             Authentication authentication) {
