@@ -1,6 +1,5 @@
 package sumcoda.webide.member.auth.social;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,11 +12,8 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import sumcoda.webide.member.auth.general.LoginResponseDTO;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -27,8 +23,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        final ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> responseData = new HashMap<>();
         RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
         log.info("OAuth2 success handler is working");
@@ -39,14 +33,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        LoginResponseDTO responseLoginDTO =
-                LoginResponseDTO.builder()
-                        .username(user.getUsername())
-                        .build();
-        responseData.put("userInfo", responseLoginDTO);
-        responseData.put("message", "로그인에 성공하였습니다.");
-
-        redirectStrategy.sendRedirect(request, response , "http://localhost:3000/oauth-login-handler?message=success");
-        objectMapper.writeValue(response.getWriter(), responseData);
+        redirectStrategy.sendRedirect(request, response , "http://localhost:3000/login/oauth/callback?isSuccess=true");
     }
 }
