@@ -49,18 +49,26 @@ public class EntryController {
         return ResponseEntity.ok(response);
     }
 
-    // 디렉토리 삭제
-    @DeleteMapping("/{containerId}/directories/{directoryId}")
-    public ResponseEntity<Map<String, String>> deleteDirectory(
-            @PathVariable Long containerId,
-            @PathVariable Long directoryId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
-        entryService.deleteDirectory(containerId, directoryId, username);
+    // 엔트리 삭제
+    @DeleteMapping("/{workspaceId}/entries/{entryId}")
+    public ResponseEntity<List<WorkspaceEntriesResponseDTO>> deleteEntry(
+            @PathVariable Long workspaceId,
+            @PathVariable Long entryId,
+            Authentication authentication) {
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "디렉토리 삭제에 성공하였습니다.");
+        String username = "";
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
+
+        List<WorkspaceEntriesResponseDTO> response = entryService.deleteEntry(workspaceId, entryId, username);
 
         return ResponseEntity.ok(response);
     }

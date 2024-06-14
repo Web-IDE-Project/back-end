@@ -76,31 +76,31 @@ public class EntryService {
         return workspaceRepository.findAllEntriesByWorkspaceId(workspaceId);
     }
 
-    // 디렉토리 삭제
-    public void deleteDirectory(Long containerId, Long directoryId, String username) {
+    // 엔트리 삭제
+    @Transactional
+    public List<WorkspaceEntriesResponseDTO> deleteEntry(Long workspaceId, Long entryId, String username) {
 
         // 워크스페이스가 존재하는지 확인
-        Workspace workspace = findWorkspaceById(containerId);
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
 
         // 유저가 워크스페이스에 권한이 존재하는지 확인
         checkUserAccessToWorkspace(workspace, username);
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
-        Entry directory = entryRepository.findByWorkspaceIdAndEntryId(containerId, directoryId)
-                .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 디렉토리 Id 입니다.: " + directoryId));
-
-        // 엔트리가 디렉토리인지 확인
-        if (!directory.getIsDirectory()) {
-            throw new EntryAccessException("파일 삭제 요청이 아닌 디렉토리 삭제 요청입니다.");
-        }
+        Entry entry = entryRepository.findByWorkspaceIdAndId(workspaceId, entryId)
+                .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 엔트리 Id 입니다.: " + entryId));
 
         // 최상위 디렉토리인지 확인
-        if (directory.getParent() == null) {
+        if (entry.getParent() == null) {
             throw new RootEntryDeleteException("최상위 디렉토리는 삭제할 수 없습니다.");
         }
 
-        // 디렉토리 삭제
-        entryRepository.delete(directory);
+        // 엔트리 삭제
+        entryRepository.delete(entry);
+
+        //엔트리를 DTO 로 변환하여 반환
+        return workspaceRepository.findAllEntriesByWorkspaceId(workspaceId);
     }
 
     // 디렉토리 이름 수정
