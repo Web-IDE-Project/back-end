@@ -1,10 +1,10 @@
 package sumcoda.webide.workspace.repository;
 
-import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
+import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 
 import java.util.List;
 
 public interface WorkspaceRepositoryCustom {
 
-    List<WorkspaceResponseDTO> findWorkspaceResponseDTOsByWorkspace(Long workspaceId);
+    List<WorkspaceEntriesResponseDTO> findAllEntriesByWorkspaceId(Long workspaceId);
 }
