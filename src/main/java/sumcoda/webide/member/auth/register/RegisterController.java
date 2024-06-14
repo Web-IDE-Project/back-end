@@ -1,4 +1,4 @@
-package sumcoda.webide.member.register;
+package sumcoda.webide.member.auth.register;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import sumcoda.webide.member.auth.AuthService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class RegisterController {
 
     // 회원가입 로직 메서드 호출을 위한 필드
-    private final RegisterService registerService;
+    private final AuthService authService;
 
     /**
      * 회원가입 요청 캐치
@@ -30,7 +31,7 @@ public class RegisterController {
 
         Map<String, Object> responseData = new HashMap<>();
         try {
-            registerService.registerMember(registerRequestDTO);
+            authService.registerMember(registerRequestDTO);
             RegisterResponseDTO registerResponseDTO =
                     RegisterResponseDTO.builder()
                             .username(registerRequestDTO.getUsername())

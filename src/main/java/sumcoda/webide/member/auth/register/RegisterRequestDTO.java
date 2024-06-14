@@ -1,4 +1,4 @@
-package sumcoda.webide.member.register;
+package sumcoda.webide.member.auth.register;
 
 import lombok.Builder;
 import lombok.Getter;
