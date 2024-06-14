@@ -9,7 +9,6 @@ import sumcoda.webide.entry.domain.Entry;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
