@@ -89,4 +89,8 @@ public class Member {
     public void assignEmail(String email) {
         this.email = email;
     }
+
+    public void assignNickname(String nickname) { this.nickname = nickname; }
+
+    public void assignPassword(String password) { this.password  = password; }
 }
