@@ -1,6 +1,5 @@
 package sumcoda.webide.member.auth.social;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,8 +17,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -29,9 +26,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         log.info("OAuth2 authentication failure handler is working");
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        Map<String, Object> responseData = new HashMap<>();
 
         RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -53,12 +48,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        responseData.put("result", "error");
-        responseData.put("message", errorMessage);
-
-
-        redirectStrategy.sendRedirect(request, response, "http://localhost:3000/oauth-login-handler?message=fail");
-        objectMapper.writeValue(response.getWriter(), responseData);
+        redirectStrategy.sendRedirect(request, response, "http://localhost:3000/login/oauth/callback?isSuccess=false?error=" + errorMessage);
     }
 
     private String getOAuth2ErrorMessage(String errorMessage) {
@@ -90,6 +80,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
         }
         return oAuth2ErrorMessage;
     }
+
     //        if (exception instanceof UsernameNotFoundException) {
 //            errorMessage = "아이디가 존재하지 않습니다.";
 //        } else if(exception instanceof BadCredentialsException) {

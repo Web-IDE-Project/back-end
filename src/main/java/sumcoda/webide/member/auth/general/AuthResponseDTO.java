@@ -1,4 +1,4 @@
-package sumcoda.webide.member.register;
+package sumcoda.webide.member.auth.general;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,15 +6,16 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class RegisterResponseDTO {
+public class AuthResponseDTO {
 
-    // 아이디
     private String username;
 
     private String nickname;
 
+//    private String imageURL;
+
     @Builder
-    public RegisterResponseDTO(String username, String nickname) {
+    public AuthResponseDTO(String username, String nickname) {
         this.username = username;
         this.nickname = nickname;
     }
