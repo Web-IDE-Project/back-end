@@ -12,7 +12,9 @@ import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.enumerate.Language;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -28,9 +30,11 @@ public class Workspace {
     private String title;
 
     // 해당 컨테이너가 어떤 종류의 컨테이너인지
-    @Column(nullable = false)
+    @ElementCollection(targetClass = Category.class)
+    @CollectionTable(name = "workspace_category", joinColumns = @JoinColumn(name = "workspace_id"))
     @Enumerated(EnumType.STRING)
-    private Category category;
+    @Column(name = "category", nullable = false)
+    private Set<Category> categories = new HashSet<>();
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -60,9 +64,9 @@ public class Workspace {
 
     // 빌더 패턴 생성자
     @Builder
-    public Workspace(String title, Category category, Language language, String description, String rootName, Boolean isPublic) {
+    public Workspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic) {
         this.title = title;
-        this.category = category;
+        this.categories = categories;
         this.language = language;
         this.description = description;
         this.rootName = rootName;
@@ -70,10 +74,10 @@ public class Workspace {
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Workspace createWorkspace(String title, Category category, Language language, String description, String rootName, Boolean isPublic) {
+    public static Workspace createWorkspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic) {
         return Workspace.builder()
                 .title(title)
-                .category(category)
+                .categories(categories)
                 .language(language)
                 .description(description)
                 .rootName(rootName)
