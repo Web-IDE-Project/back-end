@@ -11,7 +11,7 @@ import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.memberworkspace.repository.MemberWorkspaceRepository;
 import sumcoda.webide.workspace.domain.Workspace;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
-import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
+import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
@@ -109,9 +109,9 @@ public class WorkspaceService {
      * @param workspaceId Controller 에서 전달받은 워크스페이스 id
      **/
     //워크스페이스 실행
-    public List<WorkspaceResponseDTO> executeWorkspace(Long workspaceId) {
+    public List<WorkspaceEntriesResponseDTO> getAllEntriesByWorkspaceId(Long workspaceId) {
 
         //엔트리를 DTO로 변환하여 반환
-        return workspaceRepository.findWorkspaceResponseDTOsByWorkspace(workspaceId);
+        return workspaceRepository.findAllEntriesByWorkspaceId(workspaceId);
     }
 }

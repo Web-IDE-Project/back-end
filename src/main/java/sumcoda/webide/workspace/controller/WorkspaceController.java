@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.web.bind.annotation.*;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
-import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
+import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.exception.WorkspaceFoundException;
 import sumcoda.webide.workspace.service.WorkspaceService;
 
@@ -77,7 +77,7 @@ public class WorkspaceController {
         Map<String, Object> responseData = new HashMap<>();
         try {
             //워크스페이스 실행 서비스 호출
-            List<WorkspaceResponseDTO> workspaceEntries = workspaceService.executeWorkspace(workspaceId);
+            List<WorkspaceEntriesResponseDTO> workspaceEntries = workspaceService.getAllEntriesByWorkspaceId(workspaceId);
             return ResponseEntity.status(HttpStatus.OK).body(workspaceEntries);
         } catch (WorkspaceFoundException e) {
             responseData.put("result", "error");
