@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.entry.dto.request.EntryCreateRequestDTO;
 import sumcoda.webide.entry.dto.request.EntryRenameRequestDTO;
+import sumcoda.webide.entry.dto.request.EntrySaveRequestDTO;
 import sumcoda.webide.entry.dto.response.EntryCreateResponseDTO;
 import sumcoda.webide.entry.exception.*;
 import sumcoda.webide.entry.repository.EntryRepository;
@@ -140,6 +141,31 @@ public class EntryService {
 
         // 디렉토리 이름 업데이트
         entry.updateName(newName);
+    }
+
+    // 엔트리 내용 저장
+    @Transactional
+    public void saveEntry(Long workspaceId, Long entryId, EntrySaveRequestDTO entrySaveRequestDTO, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 워크스페이스 안에 엔트리가 존재하는지 확인
+        Entry entry = entryRepository.findByWorkspaceIdAndId(workspaceId, entryId)
+                .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 파일 Id 입니다.: " + entryId));
+
+        // 엔트리가 파일인지 확인
+        if (entry.getIsDirectory()) {
+            throw new EntryAccessException("디렉토리는 내용을 저장할 수 없습니다.");
+        }
+
+        // 파일 내용 업데이트
+        entry.updateContent(entrySaveRequestDTO.getContent());
+        // entryRepository.save(entry); 호출 없이도 트랜잭션이 커밋될 때 변경 사항이 반영됨.(dirty checking)
     }
 
     // 공통 메서드

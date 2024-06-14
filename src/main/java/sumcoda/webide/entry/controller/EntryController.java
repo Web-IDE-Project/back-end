@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.web.bind.annotation.*;
 import sumcoda.webide.entry.dto.request.EntryCreateRequestDTO;
 import sumcoda.webide.entry.dto.request.EntryRenameRequestDTO;
+import sumcoda.webide.entry.dto.request.EntrySaveRequestDTO;
 import sumcoda.webide.entry.dto.response.EntryCreateResponseDTO;
 import sumcoda.webide.entry.service.EntryService;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
@@ -97,6 +98,34 @@ public class EntryController {
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "이름이 수정되었습니다.");
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 엔트리 내용 저장
+    @PutMapping("/{workspaceId}/entries/{entryId}")
+    public ResponseEntity<Map<String, String>> saveEntry(
+            @PathVariable Long workspaceId,
+            @PathVariable Long entryId,
+            @RequestBody EntrySaveRequestDTO entrySaveRequestDTO,
+            Authentication authentication) {
+
+        String username = "";
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
+
+        entryService.saveEntry(workspaceId, entryId, entrySaveRequestDTO, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "파일 저장에 성공하였습니다.");
 
         return ResponseEntity.ok(response);
     }
