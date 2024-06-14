@@ -11,10 +11,12 @@ import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.memberworkspace.repository.MemberWorkspaceRepository;
 import sumcoda.webide.workspace.domain.Workspace;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
+import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,8 +26,11 @@ public class WorkspaceService {
 
     // DB에 정보를 조회, 저장하기 위한 필드
     private final WorkspaceRepository workspaceRepository;
+
     private final MemberRepository memberRepository;
+
     private final MemberWorkspaceRepository memberWorkspaceRepository;
+
     private final EntryRepository entryRepository;
 
     /**
@@ -49,6 +54,7 @@ public class WorkspaceService {
                 "WORKSPACE-" + UUID.randomUUID().toString(),
                 false
         );
+
         workspaceRepository.save(workspace);
 
         //MemberWorkspace 생성 및 저장
@@ -58,6 +64,7 @@ public class WorkspaceService {
                 member,
                 workspace
         );
+
         memberWorkspaceRepository.save(memberWorkspace);
 
         //최상위 디렉토리 생성 및 저장
@@ -68,24 +75,24 @@ public class WorkspaceService {
                 null,
                 workspace
         );
+
         entryRepository.save(rootDirectory);
 
         //기본 템플릿 파일 생성 및 저장
         String templateContent = String.format(sumcoda.webide.workspace.template.BasicTemplate.getTemplate(workspaceCreateRequestDTO.getLanguage().toString()), "Hello, World!");
-        if (templateContent != null) {
-            Entry templateFile = Entry.createEntry(
-                    getTemplateFileName(workspaceCreateRequestDTO.getLanguage().toString()),
-                    templateContent,
-                    false,
-                    rootDirectory,
-                    workspace
-            );
-            entryRepository.save(templateFile);
-        }
+        Entry templateFile = Entry.createEntry(
+                getTemplateFileName(workspaceCreateRequestDTO.getLanguage().toString()),
+                templateContent,
+                false,
+                rootDirectory,
+                workspace
+        );
+
+        entryRepository.save(templateFile);
     }
 
     //기본 템플릿 파일 이름 설정
-    private String getTemplateFileName (String language) {
+    private String getTemplateFileName(String language) {
         return switch (language) {
             case "C" -> "main.c";
             case "CPP" -> "main.cpp";
@@ -94,5 +101,17 @@ public class WorkspaceService {
             case "PYTHON" -> "main.py";
             default -> "main.txt";
         };
+    }
+
+    /**
+     * 워크스페이스 실행 요청 캐치
+     *
+     * @param workspaceId Controller 에서 전달받은 워크스페이스 id
+     **/
+    //워크스페이스 실행
+    public List<WorkspaceResponseDTO> executeWorkspace(Long workspaceId) {
+
+        //엔트리를 DTO로 변환하여 반환
+        return workspaceRepository.findWorkspaceResponseDTOsByWorkspace(workspaceId);
     }
 }

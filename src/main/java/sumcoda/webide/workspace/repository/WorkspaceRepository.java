@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import sumcoda.webide.workspace.domain.Workspace;
 
 @Repository
-public interface WorkspaceRepository extends JpaRepository <Workspace, Long> {
+public interface WorkspaceRepository extends JpaRepository <Workspace, Long>, WorkspaceRepositoryCustom {
   
 }
