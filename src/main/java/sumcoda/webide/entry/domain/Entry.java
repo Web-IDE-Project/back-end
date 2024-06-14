@@ -98,7 +98,12 @@ public class Entry {
     }
 
     // 엔트리 이름 업데이트 메서드
-    public void updateName(String newName) {
-        this.name = newName;
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    // 파일 내용 업데이트 메서드
+    public void updateContent(String content) {
+        this.content = content;
     }
 }

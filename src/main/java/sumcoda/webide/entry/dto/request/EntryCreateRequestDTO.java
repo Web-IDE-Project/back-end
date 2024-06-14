@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EntryCreateRequestDTO {
     private String name;
+    private Boolean isDirectory;
 
     @Builder
-    public EntryCreateRequestDTO(String name) {
+    public EntryCreateRequestDTO(String name, Boolean isDirectory) {
         this.name = name;
+        this.isDirectory = isDirectory;
     }
 }
