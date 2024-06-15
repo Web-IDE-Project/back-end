@@ -49,10 +49,10 @@ public class EntryService {
             throw new EntryCreateException("파일에 디렉토리를 생성할 수 없습니다.");
         }
 
-        // 파일 또는 디렉토리 이름의 형식 검증
-        if (entryName.contains(".") && !isDirectory) {
+        // 파일 또는 디렉토리 이름의 형식을 확인
+        if (entryName.contains(".") && isDirectory) {
             throw new EntryAccessException("디렉토리 이름에는 '.' 문자가 포함될 수 없습니다.");
-        } else if (!entryName.contains(".") && isDirectory) {
+        } else if (!entryName.contains(".") && !isDirectory) {
             throw new EntryAccessException("파일 이름에는 '.' 문자가 포함되어야 합니다.");
         }
 
@@ -122,10 +122,15 @@ public class EntryService {
         Entry entry = entryRepository.findByWorkspaceIdAndId(workspaceId, entryId)
                 .orElseThrow(() -> new EntryFoundException("존재하지 않는 엔트리 Id 입니다.: " + entryId));
 
-        // 파일 또는 디렉토리 이름의 형식 검증
-        if (newName.contains(".") && !isDirectory) {
+        // 엔트리의 타입 변경 요청인지 확인
+        if (isDirectory != entry.getIsDirectory()) {
+            throw new EntryAccessException("엔트리 타입을 변경할 수 없습니다.");
+        }
+
+        // 파일 또는 디렉토리 이름의 형식을 확인
+        if (newName.contains(".") && isDirectory) {
             throw new EntryAccessException("디렉토리 이름에는 '.' 문자가 포함될 수 없습니다.");
-        } else if (!newName.contains(".") && isDirectory) {
+        } else if (!newName.contains(".") && !isDirectory) {
             throw new EntryAccessException("파일 이름에는 '.' 문자가 포함되어야 합니다.");
         }
 
