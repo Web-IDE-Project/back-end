@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sumcoda.webide.member.enumerate.Role;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
+import sumcoda.webide.workspace.domain.Workspace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,28 +52,36 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    // 연관관게 주인
+    // 양방향 연관관계
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_image_id")
+    private ProfileImage profileImage;
+
     // 하나의 유저는 여러가지 컨테이너 생성가능 1:N 양방향
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
     private List<MemberWorkspace> memberWorkspaces = new ArrayList<>();
 
     // 빌더 패턴 생성자
     @Builder
-    public Member(String username, String password, String nickname, String email, Role role) {
+    public Member(String username, String password, String nickname, String email, Role role, ProfileImage profileImage) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.role = role;
+        this.assignProfileImage(profileImage);
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Member createMember(String username, String password, String nickname, String email, Role role) {
+    public static Member createMember(String username, String password, String nickname, String email, Role role, ProfileImage profileImage) {
         return Member.builder()
                 .username(username)
                 .password(password)
                 .nickname(nickname)
                 .email(email)
                 .role(role)
+                .profileImage(profileImage)
                 .build();
     }
 
@@ -83,6 +92,18 @@ public class Member {
 
         if (memberWorkspace.getMember() != this) {
             memberWorkspace.assignMember(this);
+        }
+    }
+
+    // Member 1 <-> 1 ProfileImage
+    // 양방향 연관관계 편의 메서드드
+    public void assignProfileImage(ProfileImage profileImage) {
+        if (this.profileImage != null) {
+            this.profileImage.assignMember(null);
+        }
+        this.profileImage = profileImage;
+        if (profileImage != null && profileImage.getMember() != this) {
+            profileImage.assignMember(this);
         }
     }
 
