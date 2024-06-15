@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import sumcoda.webide.member.dto.AuthResponseDTO;
 import sumcoda.webide.member.dto.MemberResponseDTO;
 import sumcoda.webide.member.repository.MemberRepository;
 
@@ -47,6 +48,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 AuthResponseDTO.builder()
                         .username(memberResponseDTO.getUsername())
                         .nickname(memberResponseDTO.getNickname())
+                        .awsS3SavedFileURL(memberResponseDTO.getAwsS3SavedFileURL())
                         .build();
 
         responseData.put("userInfo", authResponseDTO);
