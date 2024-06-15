@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sumcoda.webide.member.auth.general.AuthResponseDTO;
+import sumcoda.webide.member.dto.AuthResponseDTO;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
 
 import java.util.HashMap;
