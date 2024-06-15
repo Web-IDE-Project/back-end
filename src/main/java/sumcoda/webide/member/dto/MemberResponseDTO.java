@@ -19,12 +19,16 @@ public class MemberResponseDTO {
 
     private Role role;
 
+    private String awsS3SavedFileURL;
+
+
     @Builder
-    public MemberResponseDTO(String username, String password, String nickname, String email, Role role) {
+    public MemberResponseDTO(String username, String password, String nickname, String email, Role role, String awsS3SavedFileURL) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.role = role;
+        this.awsS3SavedFileURL = awsS3SavedFileURL;
     }
 }

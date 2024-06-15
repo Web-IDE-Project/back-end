@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sumcoda.webide.member.auth.general.AuthResponseDTO;
+import sumcoda.webide.member.dto.AuthResponseDTO;
 import sumcoda.webide.member.auth.register.RegisterRequestDTO;
 import sumcoda.webide.member.domain.Member;
 import sumcoda.webide.member.dto.MemberResponseDTO;
@@ -38,11 +38,12 @@ public class AuthService {
         }
 
         memberRepository.save(Member.createMember(
-                registerRequestDTO.getUsername(),
-                bCryptPasswordEncoder.encode(registerRequestDTO.getPassword()),
-                registerRequestDTO.getNickname(),
-                registerRequestDTO.getEmail(),
-                Role.USER));
+                        registerRequestDTO.getUsername(),
+                        bCryptPasswordEncoder.encode(registerRequestDTO.getPassword()),
+                        registerRequestDTO.getNickname(),
+                        registerRequestDTO.getEmail(),
+                        Role.USER,
+                null));
     }
 
     /**
@@ -57,6 +58,7 @@ public class AuthService {
         return AuthResponseDTO.builder()
                 .username(memberResponseDTO.getUsername())
                 .nickname(memberResponseDTO.getNickname())
+                .awsS3SavedFileURL(memberResponseDTO.getAwsS3SavedFileURL())
                 .build();
     }
 }

@@ -7,9 +7,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
 import sumcoda.webide.member.dto.UpdateMemberRequestDTO;
-import sumcoda.webide.member.serivce.MemberService;
+import sumcoda.webide.member.service.MemberService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,8 @@ public class MemberController {
      */
     @PutMapping
     public ResponseEntity<?> updateMemberInfos(
-            @RequestBody UpdateMemberRequestDTO updateMemberRequestDTO,
+            @RequestPart(value = "updateMemberRequestDTO") UpdateMemberRequestDTO updateMemberRequestDTO,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             Authentication authentication) {
 
         String username;
@@ -46,14 +48,13 @@ public class MemberController {
             username = userDetails.getUsername();
         }
 
-        // 사용자 정보를 업데이트하는 서비스 메서드 호출
-        memberService.updateMemberInfos(username, updateMemberRequestDTO);
+
 
         // 응답 데이터를 저장할 hashmap 생성
         Map<String, Object> responseData = new HashMap<>();
         try {
             // 사용자 정보를 업데이트하는 서비스 메서드 호출
-            memberService.updateMemberInfos(username, updateMemberRequestDTO);
+            memberService.updateMemberInfos(username, updateMemberRequestDTO, profileImage);
             responseData.put("message", "수정되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         } catch (Exception e) {
