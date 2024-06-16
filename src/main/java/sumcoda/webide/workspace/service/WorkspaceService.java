@@ -44,7 +44,7 @@ public class WorkspaceService {
      * @param workspaceCreateRequestDTO Controller 에서 전달받은 워크스페이스 정보
      **/
     @Transactional
-    public void createWorkspace(WorkspaceCreateRequestDTO workspaceCreateRequestDTO, String username) {
+    public Workspace createWorkspace(WorkspaceCreateRequestDTO workspaceCreateRequestDTO, String username) {
         //멤버변수를 사용하기 위한 사용자 검증
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
@@ -93,6 +93,8 @@ public class WorkspaceService {
         );
 
         entryRepository.save(templateFile);
+
+        return workspace;
     }
 
 
