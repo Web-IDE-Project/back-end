@@ -1,6 +1,7 @@
 package sumcoda.webide.member.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.oxm.ValidationFailureException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import sumcoda.webide.member.dto.AuthResponseDTO;
 import sumcoda.webide.member.auth.register.RegisterRequestDTO;
 import sumcoda.webide.member.domain.Member;
 import sumcoda.webide.member.dto.MemberResponseDTO;
+import sumcoda.webide.member.dto.ValidatePasswordRequestDTO;
 import sumcoda.webide.member.enumerate.Role;
 import sumcoda.webide.member.exception.UserAlreadyExistsException;
 import sumcoda.webide.member.repository.MemberRepository;
@@ -61,4 +63,25 @@ public class AuthService {
                 .awsS3SavedFileURL(memberResponseDTO.getAwsS3SavedFileURL())
                 .build();
     }
+
+    /**
+     * 입력된 비밀번호가 현재 로그인된 사용자의 비밀번호와 일치하는지 확인하는 메서드
+     * @param username 현재 로그인된 사용자의 사용자명
+     * @param validatePasswordRequestDTO 입력된 비밀번호가 저장된 DTO
+     * @return 비밀번호가 일치하면 true, 그렇지 않으면 false
+     */
+    public Boolean validatePassword(String username, ValidatePasswordRequestDTO validatePasswordRequestDTO) {
+        MemberResponseDTO memberResponseDTO = memberRepository.findOneByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException("해당 아이디를 가진 사용자가 존재하지 않습니다. : " + username));
+
+        // DB에 저장된 암호화된 비밀번호와 입력된 비밀번호를 비교
+        boolean isValidate = bCryptPasswordEncoder.matches(validatePasswordRequestDTO.getPassword(), memberResponseDTO.getPassword());
+
+        if (!isValidate) {
+            throw new ValidationFailureException("입력하신 비밀번호가 올바르지 않습니다.");
+        }
+
+        return true;
+    }
+
 }
