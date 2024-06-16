@@ -7,7 +7,6 @@ import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.entry.dto.request.EntryCreateRequestDTO;
 import sumcoda.webide.entry.dto.request.EntryRenameRequestDTO;
 import sumcoda.webide.entry.dto.request.EntrySaveRequestDTO;
-import sumcoda.webide.entry.dto.response.EntryCreateResponseDTO;
 import sumcoda.webide.entry.exception.*;
 import sumcoda.webide.entry.repository.EntryRepository;
 import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
@@ -17,7 +16,6 @@ import sumcoda.webide.workspace.exception.WorkspaceAccessException;
 import sumcoda.webide.workspace.exception.WorkspaceFoundException;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class EntryService {
 
     // 엔트리 생성(디렉토리 또는 파일을 생성)
     @Transactional
-    public List<WorkspaceEntriesResponseDTO> createEntry(Long workspaceId, Long parentId, EntryCreateRequestDTO entryCreateRequestDTO, String username) {
+    public WorkspaceEntriesResponseDTO createEntry(Long workspaceId, Long parentId, EntryCreateRequestDTO entryCreateRequestDTO, String username) {
 
         String entryName = entryCreateRequestDTO.getName();
         boolean isDirectory = entryCreateRequestDTO.getIsDirectory();
@@ -45,7 +43,7 @@ public class EntryService {
                 .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 엔트리 Id 입니다.: " + parentId));
 
         // 엔트리가 디렉토리인지 확인
-        if (!parentEntry.getIsDirectory()) {
+        if (Boolean.FALSE.equals(parentEntry.getIsDirectory())) {
             throw new EntryCreateException("파일에 디렉토리를 생성할 수 없습니다.");
         }
 
@@ -79,7 +77,7 @@ public class EntryService {
 
     // 엔트리 삭제
     @Transactional
-    public List<WorkspaceEntriesResponseDTO> deleteEntry(Long workspaceId, Long entryId, String username) {
+    public WorkspaceEntriesResponseDTO deleteEntry(Long workspaceId, Long entryId, String username) {
 
         // 워크스페이스가 존재하는지 확인
         Workspace workspace = workspaceRepository.findById(workspaceId)
@@ -123,7 +121,7 @@ public class EntryService {
                 .orElseThrow(() -> new EntryFoundException("존재하지 않는 엔트리 Id 입니다.: " + entryId));
 
         // 엔트리의 타입 변경 요청인지 확인
-        if (isDirectory != entry.getIsDirectory()) {
+        if (isDirectory != Boolean.TRUE.equals(entry.getIsDirectory())) {
             throw new EntryAccessException("엔트리 타입을 변경할 수 없습니다.");
         }
 
@@ -164,7 +162,7 @@ public class EntryService {
                 .orElseThrow(() -> new EntryFoundException("워크스페이스에 존재하지 않는 파일 Id 입니다.: " + entryId));
 
         // 엔트리가 파일인지 확인
-        if (entry.getIsDirectory()) {
+        if (Boolean.TRUE.equals(entry.getIsDirectory())) {
             throw new EntryAccessException("디렉토리는 내용을 저장할 수 없습니다.");
         }
 

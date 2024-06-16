@@ -104,25 +104,39 @@ public class WorkspaceService {
      * @param workspaceId Controller 에서 전달받은 워크스페이스 id
      **/
     //워크스페이스 실행
-    public List<WorkspaceEntriesResponseDTO> getAllEntriesByWorkspaceId(Long workspaceId) {
+    public WorkspaceEntriesResponseDTO getAllEntriesByWorkspaceId(Long workspaceId) {
 
         //엔트리를 DTO로 변환하여 반환
         return workspaceRepository.findAllEntriesByWorkspaceId(workspaceId);
     }
 
     @Transactional(readOnly = true)
-    public List<WorkspaceResponseDTO> getWorkspacesByCategory(Category category) {
+    public List<?> getWorkspacesByCategory(Category category) {
         List<WorkspaceResponseDAO> workspaceResponseDAOList = workspaceRepository.findWorkspacesByCategory(category);
 
-        return workspaceResponseDAOList.stream()
-                .map(data -> WorkspaceResponseDTO.builder()
-                        .id(data.getId())
-                        .title(data.getTitle())
-                        .language(data.getLanguage().getValue())
-                        .description(data.getDescription())
-                        .nickname(category == Category.MY ? null : data.getNickname())
-                        .build())
-                .toList();
+        if (category == Category.MY) {
+            return workspaceResponseDAOList.stream()
+                    .map(data -> WorkspaceResponseDTO.My.builder()
+                            .id(data.getId())
+                            .title(data.getTitle())
+                            .language(data.getLanguage().name())
+                            .description(data.getDescription())
+                            .nickname(null)
+                            .awsS3SavedFileURL(data.getAwsS3SavedFileURL())
+                            .build())
+                    .toList();
+        } else {
+            return workspaceResponseDAOList.stream()
+                    .map(data -> WorkspaceResponseDTO.builder()
+                            .id(data.getId())
+                            .title(data.getTitle())
+                            .language(data.getLanguage().name())
+                            .description(data.getDescription())
+                            .nickname(data.getNickname())
+                            .awsS3SavedFileURL(data.getAwsS3SavedFileURL())
+                            .build())
+                    .toList();
+        }
     }
 
     //기본 템플릿 파일 이름 설정
