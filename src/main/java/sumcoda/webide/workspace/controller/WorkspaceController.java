@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
-import sumcoda.webide.workspace.domain.Workspace;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
@@ -56,9 +55,9 @@ public class WorkspaceController {
 
         Map<String, Object> responseData = new HashMap<>();
         try {
-            Workspace workspace = workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
+            Long workspaceId = workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
             workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
-            responseData.put("workspaceId", workspace.getId());
+            responseData.put("id", workspaceId);
         } catch (Exception e) {
             e.printStackTrace();
             responseData.put("result", "error");
