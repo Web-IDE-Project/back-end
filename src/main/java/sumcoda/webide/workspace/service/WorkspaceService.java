@@ -53,7 +53,7 @@ public class WorkspaceService {
         //Category 값과 isPublic 값은 디폴트 값으로 저장
         Workspace workspace = Workspace.createWorkspace(
                 workspaceCreateRequestDTO.getTitle(),
-                new HashSet<>(Arrays.asList(Category.MY, Category.QUESTION)),
+                new HashSet<>(Arrays.asList(Category.MY)),
                 workspaceCreateRequestDTO.getLanguage(),
                 workspaceCreateRequestDTO.getDescription(),
                 false
