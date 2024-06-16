@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static sumcoda.webide.entry.domain.QEntry.*;
 import static sumcoda.webide.member.domain.QMember.member;
+import static sumcoda.webide.member.domain.QProfileImage.*;
 import static sumcoda.webide.memberworkspace.domain.QMemberWorkspace.memberWorkspace;
 import static sumcoda.webide.workspace.domain.QWorkspace.workspace;
 @Slf4j
@@ -25,7 +26,7 @@ public class WorkspaceRepositoryCustomImpl implements WorkspaceRepositoryCustom 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<WorkspaceEntriesResponseDTO> findAllEntriesByWorkspaceId(Long workspaceId) {
+    public WorkspaceEntriesResponseDTO findAllEntriesByWorkspaceId(Long workspaceId) {
         List<Entry> entries = jpaQueryFactory.selectFrom(entry) // entry 엔티티를 선택
                 .where(entry.workspace.id.eq(workspaceId)) // workspaceId와 일치하는 항목을 필터링
                 .fetch();
@@ -35,7 +36,7 @@ public class WorkspaceRepositoryCustomImpl implements WorkspaceRepositoryCustom 
         return entries.stream() // entries 목록을 스트림으로 변환
                 .map(entry -> WorkspaceEntriesResponseDTO.fromEntity(entry, idSet)) // 각 항목을 DTO로 변환
                 .filter(Objects::nonNull) // null이 아닌 항목만 필터링
-                .toList();
+                .toList().get(0);
     }
 
     @Override
@@ -45,10 +46,13 @@ public class WorkspaceRepositoryCustomImpl implements WorkspaceRepositoryCustom 
                         workspace.title,
                         workspace.language,
                         workspace.description,
-                        member.nickname))
+                        member.nickname,
+                        profileImage.awsS3SavedFileURL
+                ))
                 .from(workspace)
                 .leftJoin(workspace.memberWorkspaces, memberWorkspace)
                 .leftJoin(memberWorkspace.member, member)
+                .leftJoin(member.profileImage, profileImage)
                 .where(workspace.categories.contains(category))
                 .fetch();
     }
