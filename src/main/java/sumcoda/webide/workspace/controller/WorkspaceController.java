@@ -52,10 +52,12 @@ public class WorkspaceController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             username = userDetails.getUsername();
         }
+
         Map<String, Object> responseData = new HashMap<>();
         try {
+            Long workspaceId = workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
             workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
-            responseData.put("message", "워크스페이스가 생성되었습니다.");
+            responseData.put("id", workspaceId);
         } catch (Exception e) {
             e.printStackTrace();
             responseData.put("result", "error");
