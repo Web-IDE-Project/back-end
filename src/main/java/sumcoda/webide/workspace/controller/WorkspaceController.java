@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
-import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.exception.WorkspaceFoundException;
 import sumcoda.webide.workspace.service.WorkspaceService;
@@ -81,7 +80,7 @@ public class WorkspaceController {
         Map<String, Object> responseData = new HashMap<>();
         try {
             //워크스페이스 실행 서비스 호출
-            List<WorkspaceEntriesResponseDTO> workspaceEntries = workspaceService.getAllEntriesByWorkspaceId(workspaceId);
+            WorkspaceEntriesResponseDTO workspaceEntries = workspaceService.getAllEntriesByWorkspaceId(workspaceId);
             return ResponseEntity.status(HttpStatus.OK).body(workspaceEntries);
         } catch (WorkspaceFoundException e) {
             responseData.put("result", "error");
@@ -90,17 +89,15 @@ public class WorkspaceController {
         }
     }
 
-    @GetMapping("/{category}")
+    @GetMapping("/{category}/get")
     public ResponseEntity<?> getWorkspacesByCategory(@PathVariable Category category) {
 
         Map<String, Object> responseData = new HashMap<>();
         log.info(category.getValue());
 
         try {
-            List<WorkspaceResponseDTO> workspacesByCategory = workspaceService.getWorkspacesByCategory(category);
-            responseData.put("message", category.getValue() + " 워크스페이스를 성공적으로 조회했습니다.");
-            responseData.put("result", workspacesByCategory);
-            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+            List<?> workspacesByCategory = workspaceService.getWorkspacesByCategory(category);
+            return ResponseEntity.status(HttpStatus.OK).body(workspacesByCategory);
 
         } catch (Exception e) {
             e.printStackTrace();
