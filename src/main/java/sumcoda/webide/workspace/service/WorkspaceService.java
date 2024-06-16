@@ -112,8 +112,8 @@ public class WorkspaceService {
     }
 
     @Transactional(readOnly = true)
-    public List<?> getWorkspacesByCategory(Category category) {
-        List<WorkspaceResponseDAO> workspaceResponseDAOList = workspaceRepository.findWorkspacesByCategory(category);
+    public List<?> getWorkspacesByCategory(Category category, String username) {
+        List<WorkspaceResponseDAO> workspaceResponseDAOList = workspaceRepository.findWorkspacesByCategory(category, username);
 
         if (category == Category.MY) {
             return workspaceResponseDAOList.stream()

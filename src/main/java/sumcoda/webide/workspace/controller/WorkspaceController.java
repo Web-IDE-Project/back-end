@@ -47,6 +47,7 @@ public class WorkspaceController {
             CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
             username = oauthUser.getUsername();
 
+
             // 그외 사용자
         } else {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -92,13 +93,29 @@ public class WorkspaceController {
     }
 
     @GetMapping("/{category}/get")
-    public ResponseEntity<?> getWorkspacesByCategory(@PathVariable Category category) {
+    public ResponseEntity<?> getWorkspacesByCategory(@PathVariable Category category, Authentication authentication) {
 
         Map<String, Object> responseData = new HashMap<>();
         log.info(category.getValue());
 
+        String username;
+
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+            log.info("유저이름 : " + username);
+
+
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+            log.info("유저이름 : " + username);
+        }
+
         try {
-            List<?> workspacesByCategory = workspaceService.getWorkspacesByCategory(category);
+            List<?> workspacesByCategory = workspaceService.getWorkspacesByCategory(category, username);
             return ResponseEntity.status(HttpStatus.OK).body(workspacesByCategory);
 
         } catch (Exception e) {
