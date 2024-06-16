@@ -10,5 +10,5 @@ public interface WorkspaceRepositoryCustom {
 
     WorkspaceEntriesResponseDTO findAllEntriesByWorkspaceId(Long workspaceId);
 
-    List<WorkspaceResponseDAO> findWorkspacesByCategory(Category category);
+    List<WorkspaceResponseDAO> findWorkspacesByCategory(Category category, String username);
 }

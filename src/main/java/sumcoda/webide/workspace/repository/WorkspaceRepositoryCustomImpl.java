@@ -1,10 +1,12 @@
 package sumcoda.webide.workspace.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import sumcoda.webide.entry.domain.Entry;
+import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.enumerate.Category;
@@ -40,7 +42,10 @@ public class WorkspaceRepositoryCustomImpl implements WorkspaceRepositoryCustom 
     }
 
     @Override
-    public List<WorkspaceResponseDAO> findWorkspacesByCategory(Category category) {
+    public List<WorkspaceResponseDAO> findWorkspacesByCategory(Category category, String username) {
+
+        BooleanExpression whereClause = whereClause(category, username);
+
         return jpaQueryFactory.select(Projections.fields(WorkspaceResponseDAO.class,
                         workspace.id,
                         workspace.title,
@@ -53,7 +58,19 @@ public class WorkspaceRepositoryCustomImpl implements WorkspaceRepositoryCustom 
                 .leftJoin(workspace.memberWorkspaces, memberWorkspace)
                 .leftJoin(memberWorkspace.member, member)
                 .leftJoin(member.profileImage, profileImage)
-                .where(workspace.categories.contains(category))
+                .where(whereClause)
                 .fetch();
+    }
+
+    // 동적으로 where 조건을 설정할 수 있는 메서드
+    private BooleanExpression whereClause(Category category, String username) {
+        BooleanExpression whereClause = workspace.categories.contains(category);
+
+        if (category == Category.MY) {
+            whereClause = whereClause.and(member.username.eq(username))
+                    .and(memberWorkspace.role.eq(MemberWorkspaceRole.ADMIN));
+        }
+
+        return whereClause;
     }
 }
