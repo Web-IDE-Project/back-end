@@ -56,7 +56,6 @@ public class WorkspaceService {
                 new HashSet<>(Arrays.asList(Category.MY, Category.QUESTION)),
                 workspaceCreateRequestDTO.getLanguage(),
                 workspaceCreateRequestDTO.getDescription(),
-                "WORKSPACE-" + UUID.randomUUID().toString(),
                 false
         );
 

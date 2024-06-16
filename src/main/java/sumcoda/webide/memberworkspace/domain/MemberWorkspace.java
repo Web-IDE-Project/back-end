@@ -22,6 +22,7 @@ public class MemberWorkspace {
 
     // 방에 참서한 유저의 역할
     // admin, editor, viewer
+    @Enumerated(EnumType.STRING)
     private MemberWorkspaceRole role;
 
     // 해당 유저가 방에 참석한 시점

@@ -42,9 +42,6 @@ public class Workspace {
 
     private String description;
 
-    @Column(nullable = false)
-    private String rootName;
-
     // private 인지 public 인지
     @Column(nullable = false)
     private Boolean isPublic;
@@ -64,23 +61,21 @@ public class Workspace {
 
     // 빌더 패턴 생성자
     @Builder
-    public Workspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic) {
+    public Workspace(String title, Set<Category> categories, Language language, String description, Boolean isPublic) {
         this.title = title;
         this.categories = categories;
         this.language = language;
         this.description = description;
-        this.rootName = rootName;
         this.isPublic = isPublic;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Workspace createWorkspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic) {
+    public static Workspace createWorkspace(String title, Set<Category> categories, Language language, String description, Boolean isPublic) {
         return Workspace.builder()
                 .title(title)
                 .categories(categories)
                 .language(language)
                 .description(description)
-                .rootName(rootName)
                 .isPublic(isPublic)
                 .build();
     }
