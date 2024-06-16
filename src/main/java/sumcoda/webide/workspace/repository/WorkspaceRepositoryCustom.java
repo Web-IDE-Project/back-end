@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface WorkspaceRepositoryCustom {
 
-    List<WorkspaceEntriesResponseDTO> findAllEntriesByWorkspaceId(Long workspaceId);
+    WorkspaceEntriesResponseDTO findAllEntriesByWorkspaceId(Long workspaceId);
 
     List<WorkspaceResponseDAO> findWorkspacesByCategory(Category category);
 }
