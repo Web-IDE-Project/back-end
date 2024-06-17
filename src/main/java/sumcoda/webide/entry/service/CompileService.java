@@ -46,7 +46,7 @@ public class CompileService {
      * @param extension 언어를 구분하기위한 확장자
      * @param code 컴파일을 진행할 코드
      **/
-    public String compileCode(String extension, String code) throws IOException, InterruptedException {
+    public String compileAndExecute(String extension, String code) throws IOException, InterruptedException {
 
         // 임시 디렉토리의 경로 생성
         String tempDir = System.getProperty("java.io.tmpdir");
@@ -60,7 +60,7 @@ public class CompileService {
         }
 
         // 주어진 언어에 맞는 파일 확장자를 가져와 임시 파일의 경로 생성
-        String codeFilePath = tempDir + "/" + filename + extension;
+        String codeFilePath = new StringBuilder().append(tempDir).append("/").append(filename).append(extension).toString();
 
         // 주어진 언어에 맞는 Docker 이미지를 반환
         String dockerImage = getDockerImage(extension);
@@ -171,15 +171,4 @@ public class CompileService {
             return log.toString();
         }
     }
-
-    //    private String getFileExtension(String language) {
-//        switch (language.toLowerCase()) {
-//            case "java": return ".java";
-//            case "c": return ".c";
-//            case "cpp": return ".cpp";
-//            case "python": return ".py";
-//            case "javascript": return ".js";
-//            default: throw new IllegalArgumentException("Unsupported language: " + language);
-//        }
-//    }
 }

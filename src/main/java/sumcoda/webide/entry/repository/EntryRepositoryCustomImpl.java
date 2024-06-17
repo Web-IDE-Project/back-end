@@ -20,109 +20,101 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+
+    /**
+     * 주어진 워크스페이스 ID로 루트 엔트리를 찾음
+     *
+     * @param workspaceId 워크스페이스 ID
+     * @return 루트 엔트리 객체
+     */
     @Override
-    public Optional<EntryResponseDTO> findRootByWorkspaceIdDTO(Long workspaceId){
+    public Optional<Entry> findRootByWorkspaceId(Long workspaceId) {
+        Entry rootEntry = jpaQueryFactory
+                .selectFrom(entry)
+                .where(entry.workspace.id.eq(workspaceId)
+                        .and(entry.parent.isNull()))
+                .fetchOne();
+        return Optional.ofNullable(rootEntry);
+    }
+
+    /**
+     * 주어진 경로로 엔트리를 찾음
+     *
+     * @param workspaceId 워크스페이스 ID
+     * @param path 엔트리 경로
+     * @return 경로에 해당하는 엔트리 객체
+     */
+    @Override
+    public Optional<Entry> findByPath(Long workspaceId, String path) {
+        // 이 메서드는 QueryDSL을 사용하여 경로를 기반으로 엔트리를 검색하는 로직을 구현해야 합니다.
+        // 예를 들어, 경로를 '/'로 구분하여 단계적으로 엔트리를 검색할 수 있습니다.
+        // 간단한 예제는 다음과 같습니다:
+        String[] parts = path.split("/");
+        Entry currentEntry = jpaQueryFactory
+                .selectFrom(entry)
+                .where(entry.workspace.id.eq(workspaceId)
+                        .and(entry.parent.isNull())
+                        .and(entry.name.eq(parts[1])))
+                .fetchOne();
+        if (currentEntry == null) {
+            return Optional.empty();
+        }
+        for (int i = 2; i < parts.length; i++) {
+            currentEntry = jpaQueryFactory
+                    .selectFrom(entry)
+                    .where(entry.workspace.id.eq(workspaceId)
+                            .and(entry.parent.eq(currentEntry))
+                            .and(entry.name.eq(parts[i])))
+                    .fetchOne();
+            if (currentEntry == null) {
+                return Optional.empty();
+            }
+        }
+        return Optional.ofNullable(currentEntry);
+    }
+
+    /**
+     * 주어진 워크스페이스 ID로 루트 엔트리를 찾음
+     *
+     * @param workspaceId 워크스페이스 ID
+     * @return 루트 엔트리를 나타내는 EntryResponseDTO 객체
+     */
+    @Override
+    public Optional<EntryResponseDTO> findRootByWorkspaceIdDTO(Long workspaceId) {
         EntryResponseDTO rootEntry = jpaQueryFactory
                 .select(Projections.fields(EntryResponseDTO.class,
                         entry.id,
                         entry.name,
-                        entry.isDirectory,
                         entry.content,
-                        entry.parent.id))
+                        entry.isDirectory,
+                        entry.parent.id,
+                        entry.workspace.id))
                 .from(entry)
-                .where(entry.parent.isNull()
-                        .and(entry.isDirectory.isTrue())
-                        .and(entry.workspace.id.eq(workspaceId)))
+                .where(entry.workspace.id.eq(workspaceId)
+                        .and(entry.parent.isNull()))
                 .fetchOne();
-
         return Optional.ofNullable(rootEntry);
     }
 
+    /**
+     * 주어진 부모 ID로 자식 엔트리 목록을 찾음
+     *
+     * @param parentId 부모 엔트리 ID
+     * @return 자식 엔트리 목록을 나타내는 EntryResponseDTO 리스트
+     */
     @Override
-    public Optional<Entry> findRootByWorkspaceIdEntity(Long workspaceId){
-        Entry rootEntry = jpaQueryFactory
-                .select(entry)
-                .from(entry)
-                .where(entry.parent.isNull()
-                        .and(entry.isDirectory.isTrue())
-                        .and(entry.workspace.id.eq(workspaceId)))
-                .fetchOne();
-
-        return Optional.ofNullable(rootEntry);
-    }
-
-    @Override
-    public Optional<EntryResponseDTO> findByPathDTO(Long workspaceId, String path) {
-        EntryResponseDTO currentEntry = findRootByWorkspaceIdDTO(workspaceId).orElse(null);
-        if (currentEntry == null) {
-            return Optional.empty();
-        }
-
-        String[] parts = path.split("/");
-
-        for (String part : parts) {
-            if (part.isEmpty()) continue;
-
-            currentEntry = jpaQueryFactory
-                    .select(Projections.fields(EntryResponseDTO.class,
-                            entry.id,
-                            entry.name,
-                            entry.isDirectory,
-                            entry.content,
-                            entry.parent.id))
-                    .from(entry)
-                    .where(entry.name.eq(part)
-                            .and(entry.parent.id.eq(currentEntry.getId()))
-                            .and(entry.workspace.id.eq(workspaceId)))
-                    .fetchOne();
-
-            if (currentEntry == null) {
-                return Optional.empty();
-            }
-        }
-
-        return Optional.ofNullable(currentEntry);
-    }
-
-    @Override
-    public Optional<Entry> findByPathEntity(Long workspaceId, String path) {
-        Entry currentEntry = findRootByWorkspaceIdEntity(workspaceId).orElse(null);
-        if (currentEntry == null) {
-            return Optional.empty();
-        }
-
-        String[] parts = path.split("/");
-
-        for (String part : parts) {
-            if (part.isEmpty()) continue;
-
-            currentEntry = jpaQueryFactory
-                    .select(entry)
-                    .from(entry)
-                    .where(entry.name.eq(part)
-                            .and(entry.parent.id.eq(currentEntry.getId()))
-                            .and(entry.workspace.id.eq(workspaceId)))
-                    .fetchOne();
-
-            if (currentEntry == null) {
-                return Optional.empty();
-            }
-        }
-
-        return Optional.ofNullable(currentEntry);
-    }
-
-    @Override
-    public List<EntryResponseDTO> findChildren(Long parentId) {
+    public List<EntryResponseDTO> findChildrenDTO(Long parentId) {
         return jpaQueryFactory
                 .select(Projections.fields(EntryResponseDTO.class,
                         entry.id,
                         entry.name,
-                        entry.isDirectory,
                         entry.content,
-                        entry.parent.id))
+                        entry.isDirectory,
+                        entry.parent.id,
+                        entry.workspace.id))
                 .from(entry)
                 .where(entry.parent.id.eq(parentId))
                 .fetch();
     }
+
 }

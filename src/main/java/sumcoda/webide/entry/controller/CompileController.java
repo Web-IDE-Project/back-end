@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sumcoda.webide.entry.dto.request.CompileRequestDTO;
 import sumcoda.webide.entry.service.CompileService;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,13 +30,13 @@ public class CompileController {
         Map<String, Object> responseData = new HashMap<>();
 
         try {
-            String result = compileService.compileCode(compileRequestDTO.getExtension(), compileRequestDTO.getCode());
+            String result = compileService.compileAndExecute(compileRequestDTO.getExtension(), compileRequestDTO.getCode());
 
             responseData.put("message", "컴파일에 성공하였습니다.");
 
             responseData.put("result", result);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
-        } catch (Exception e) {
+        } catch (InterruptedException | IOException e) {
             responseData.put("message", "컴파일에 실패하였습니다.");
 
             responseData.put("result", e.getMessage());
