@@ -12,7 +12,6 @@ import sumcoda.webide.member.auth.social.CustomOAuth2User;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
-import sumcoda.webide.workspace.exception.WorkspaceFoundException;
 import sumcoda.webide.workspace.service.WorkspaceService;
 
 import java.util.HashMap;
@@ -54,20 +53,14 @@ public class WorkspaceController {
             username = userDetails.getUsername();
         }
 
-        Map<String, Object> responseData = new HashMap<>();
-        try {
-            Long workspaceId = workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
-            workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
-            responseData.put("id", workspaceId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            responseData.put("result", "error");
-            responseData.put("message", "워크스페이스가 정상적으로 생성되지 않았습니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
-        }
+        Long response = workspaceService.createWorkspace(workspaceCreateRequestDTO, username);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("id", response);
+
+        return ResponseEntity.ok(responseData);
     }
+
 
     /**
      * 워크스페이스 실행 시 엔트리 목록 반환하는 메서드
@@ -80,16 +73,24 @@ public class WorkspaceController {
             @PathVariable Long workspaceId,
             Authentication authentication) {
 
-        Map<String, Object> responseData = new HashMap<>();
-        try {
-            //워크스페이스 실행 서비스 호출
-            WorkspaceEntriesResponseDTO workspaceEntries = workspaceService.getAllEntriesByWorkspaceId(workspaceId);
-            return ResponseEntity.status(HttpStatus.OK).body(workspaceEntries);
-        } catch (WorkspaceFoundException e) {
-            responseData.put("result", "error");
-            responseData.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        String username;
+
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            // OAuth2.0 사용자
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+
+
+            // 그외 사용자
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
         }
+
+        //워크스페이스 실행 서비스 호출
+        WorkspaceEntriesResponseDTO workspaceEntries = workspaceService.getAllEntriesByWorkspaceId(workspaceId, username);
+
+        return ResponseEntity.ok(workspaceEntries);
     }
 
     @GetMapping("/{category}/get")

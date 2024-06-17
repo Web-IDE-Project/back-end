@@ -18,6 +18,7 @@ import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.exception.WorkspaceAccessException;
+import sumcoda.webide.workspace.exception.WorkspaceNotCreateException;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,18 @@ public class WorkspaceService {
         //멤버변수를 사용하기 위한 사용자 검증
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+
+        // title == null이면 예외 발생
+        if (workspaceCreateRequestDTO.getTitle() == null)
+        {
+            throw new WorkspaceNotCreateException("컨테이너 이름을 입력해주세요.");
+        }
+
+        // language == null이면 예외 발생
+        if (workspaceCreateRequestDTO.getLanguage() == null)
+        {
+            throw new WorkspaceNotCreateException("언어를 선택해주세요.");
+        }
 
         //워크스페이스 생성 및 저장
         //Category 값과 isPublic 값은 디폴트 값으로 저장
@@ -128,7 +141,7 @@ public class WorkspaceService {
         if (Boolean.TRUE.equals(!workspaceRepository.hasUserAccess(workspaceId, username)) ||
                 (!workspaceAccessDTO.isPublic() && workspaceAccessDTO.getRole() != MemberWorkspaceRole.ADMIN))
         {
-            throw new WorkspaceAccessException("해당 유저는 워크스페이스에 접근 권한이 없습니다.: " + username);
+            throw new WorkspaceAccessException("해당 컨테이너에 접근 권한이 없습니다.: " + username);
         }
     }
 
