@@ -16,6 +16,7 @@ import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
+import sumcoda.webide.workspace.enumerate.Status;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 import java.time.LocalDateTime;
@@ -57,7 +58,8 @@ public class WorkspaceService {
                 workspaceCreateRequestDTO.getLanguage(),
                 workspaceCreateRequestDTO.getDescription(),
                 "WORKSPACE-" + UUID.randomUUID().toString(),
-                false
+                false,
+                Status.DEFAULT
         );
 
         workspaceRepository.save(workspace);

@@ -10,6 +10,7 @@ import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.enumerate.Language;
+import sumcoda.webide.workspace.enumerate.Status;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,6 +50,10 @@ public class Workspace {
     @Column(nullable = false)
     private Boolean isPublic;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     // 양방향 연관관계
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
     private List<MemberWorkspace> memberWorkspaces = new ArrayList<>();
@@ -64,17 +69,18 @@ public class Workspace {
 
     // 빌더 패턴 생성자
     @Builder
-    public Workspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic) {
+    public Workspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic, Status status) {
         this.title = title;
         this.categories = categories;
         this.language = language;
         this.description = description;
         this.rootName = rootName;
         this.isPublic = isPublic;
+        this.status = status;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Workspace createWorkspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic) {
+    public static Workspace createWorkspace(String title, Set<Category> categories, Language language, String description, String rootName, Boolean isPublic, Status status) {
         return Workspace.builder()
                 .title(title)
                 .categories(categories)
@@ -82,6 +88,7 @@ public class Workspace {
                 .description(description)
                 .rootName(rootName)
                 .isPublic(isPublic)
+                .status(status)
                 .build();
     }
 
