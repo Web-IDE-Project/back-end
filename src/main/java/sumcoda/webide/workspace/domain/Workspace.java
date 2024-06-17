@@ -10,6 +10,7 @@ import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.enumerate.Language;
+import sumcoda.webide.workspace.enumerate.Status;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,25 +59,30 @@ public class Workspace {
     @OneToOne(mappedBy = "workspace")
     private ChatRoom chatRoom;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     // 빌더 패턴 생성자
     @Builder
-    public Workspace(String title, Set<Category> categories, Language language, String description, Boolean isPublic) {
+    public Workspace(String title, Set<Category> categories, Language language, String description, Boolean isPublic, Status status) {
         this.title = title;
         this.categories = categories;
         this.language = language;
         this.description = description;
         this.isPublic = isPublic;
+        this.status = status;
     }
 
     // 직접 빌더 패턴의 생성자를 활용하지 말고 해당 메서드를 활용하여 엔티티 생성
-    public static Workspace createWorkspace(String title, Set<Category> categories, Language language, String description, Boolean isPublic) {
+    public static Workspace createWorkspace(String title, Set<Category> categories, Language language, String description, Boolean isPublic, Status status) {
         return Workspace.builder()
                 .title(title)
                 .categories(categories)
                 .language(language)
                 .description(description)
                 .isPublic(isPublic)
+                .status(status)
                 .build();
     }
 
