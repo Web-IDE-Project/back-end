@@ -17,6 +17,7 @@ import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
+import sumcoda.webide.workspace.enumerate.Status;
 import sumcoda.webide.workspace.exception.WorkspaceAccessException;
 import sumcoda.webide.workspace.exception.WorkspaceNotCreateException;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
@@ -71,7 +72,8 @@ public class WorkspaceService {
                 new HashSet<>(Arrays.asList(Category.MY)),
                 workspaceCreateRequestDTO.getLanguage(),
                 workspaceCreateRequestDTO.getDescription(),
-                false
+                false,
+                Status.DEFAULT
         );
 
         workspaceRepository.save(workspace);
