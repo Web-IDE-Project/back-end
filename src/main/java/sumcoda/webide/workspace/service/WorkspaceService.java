@@ -11,11 +11,13 @@ import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
 import sumcoda.webide.memberworkspace.repository.MemberWorkspaceRepository;
 import sumcoda.webide.workspace.domain.Workspace;
+import sumcoda.webide.workspace.dto.WorkspaceAccessDTO;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
+import sumcoda.webide.workspace.exception.WorkspaceAccessException;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 import java.time.LocalDateTime;
@@ -98,17 +100,36 @@ public class WorkspaceService {
     }
 
 
-
     /**
      * 워크스페이스 실행 요청 캐치
      *
      * @param workspaceId Controller 에서 전달받은 워크스페이스 id
      **/
     //워크스페이스 실행
-    public WorkspaceEntriesResponseDTO getAllEntriesByWorkspaceId(Long workspaceId) {
-
+    public WorkspaceEntriesResponseDTO getAllEntriesByWorkspaceId(Long workspaceId, String username) {
+        //유저 검증
+        validateUserAccess(workspaceId, username);
         //엔트리를 DTO로 변환하여 반환
         return workspaceRepository.findAllEntriesByWorkspaceId(workspaceId);
+    }
+
+
+    /**
+     * 유저가 워크스페이스에 접근 권한이 있는지 확인하는 메서드
+     *
+     * @param workspaceId 워크스페이스 ID
+     * @param username 사용자명
+     **/
+    private void validateUserAccess(Long workspaceId, String username) {
+        WorkspaceAccessDTO workspaceAccessDTO = workspaceRepository.findWorkspaceAccessInfo(workspaceId, username);
+
+        /* 유저가 해당 워크스페이스에 접근 권한이 없거나
+        private 워크스페이스에 admin이 아닌 유저가 접근하려고 하면 예외 발생 */
+        if (Boolean.TRUE.equals(!workspaceRepository.hasUserAccess(workspaceId, username)) ||
+                (!workspaceAccessDTO.isPublic() && workspaceAccessDTO.getRole() != MemberWorkspaceRole.ADMIN))
+        {
+            throw new WorkspaceAccessException("해당 유저는 워크스페이스에 접근 권한이 없습니다.: " + username);
+        }
     }
 
     @Transactional(readOnly = true)
