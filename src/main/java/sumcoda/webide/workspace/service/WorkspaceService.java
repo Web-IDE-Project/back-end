@@ -23,10 +23,7 @@ import sumcoda.webide.workspace.exception.WorkspaceNotCreateException;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -138,13 +135,47 @@ public class WorkspaceService {
     private void validateUserAccess(Long workspaceId, String username) {
         WorkspaceAccessDTO workspaceAccessDTO = workspaceRepository.findWorkspaceAccessInfo(workspaceId, username);
 
-        /* 유저가 해당 워크스페이스에 접근 권한이 없거나
-        private 워크스페이스에 admin이 아닌 유저가 접근하려고 하면 예외 발생 */
-        if (Boolean.TRUE.equals(!workspaceRepository.hasUserAccess(workspaceId, username)) ||
-                (!workspaceAccessDTO.isPublic() && workspaceAccessDTO.getRole() != MemberWorkspaceRole.ADMIN))
+        // public 워크스페이스일 때, 참여하는 유저에게 viewer 권한 설정
+        if (workspaceAccessDTO.isPublic()) {
+            assignViewerRole(workspaceId, username);
+        }
+
+        // private 워크스페이스일 때, admin이 아닌 유저가 접근하려고 하면 예외 발생
+        if (!workspaceAccessDTO.isPublic() && workspaceAccessDTO.getRole() != MemberWorkspaceRole.ADMIN)
         {
             throw new WorkspaceAccessException("해당 컨테이너에 접근 권한이 없습니다.: " + username);
         }
+
+        // 유저가 해당 워크스페이스에 접근 권한이 없으면 예외 발생
+        if (Objects.equals(Boolean.TRUE,
+                !workspaceRepository.hasUserAccess(workspaceId, username)))
+        {
+            throw new WorkspaceAccessException("해당 컨테이너에 접근 권한이 없습니다.: " + username);
+        }
+    }
+
+    /**
+     * 퍼블릭 워크스페이스일 때, 참여하는 다른 사용자들에게 워크스페이스 실행(참여) 시에 자동으로 viewer 권한을 부여하는 메서드
+     *
+     * @param workspaceId 워크스페이스 ID
+     * @param username 사용자명
+     **/
+    private void assignViewerRole(Long workspaceId, String username) {
+        MemberWorkspace memberWorkspace = memberWorkspaceRepository.findByUsernameAndWorkspaceId(username, workspaceId)
+                .orElse(null);
+
+        if (memberWorkspace == null) {
+            memberWorkspace = MemberWorkspace.createMemberWorkspace(
+                    MemberWorkspaceRole.VIEWER,
+                    LocalDateTime.now(),
+                    memberRepository.findByUsername(username)
+                            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다.")),
+                    workspaceRepository.findById(workspaceId)
+                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컨테이너입니다."))
+            );
+        }
+
+        memberWorkspaceRepository.save(memberWorkspace);
     }
 
     @Transactional(readOnly = true)
@@ -158,7 +189,6 @@ public class WorkspaceService {
                             .title(data.getTitle())
                             .language(data.getLanguage().name())
                             .description(data.getDescription())
-                            .status(data.getStatus().name())
                             .nickname(null)
                             .awsS3SavedFileURL(data.getAwsS3SavedFileURL())
                             .build())
@@ -170,7 +200,6 @@ public class WorkspaceService {
                             .title(data.getTitle())
                             .language(data.getLanguage().name())
                             .description(data.getDescription())
-                            .status(data.getStatus().name())
                             .nickname(data.getNickname())
                             .awsS3SavedFileURL(data.getAwsS3SavedFileURL())
                             .build())
