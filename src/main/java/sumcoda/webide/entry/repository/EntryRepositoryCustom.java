@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EntryRepositoryCustom {
+
+    Optional<Entry> findRootByWorkspaceId(Long workspaceId);
+
+    Optional<Entry> findByPath(Long workspaceId, String path);
+
     Optional<EntryResponseDTO> findRootByWorkspaceIdDTO(Long workspaceId);
 
-    Optional<Entry> findRootByWorkspaceIdEntity(Long workspaceId);
-    Optional<EntryResponseDTO> findByPathDTO(Long workspaceId, String path);
-
-    // 주어진 경로와 워크스페이스 ID에 해당하는 Entry를 찾음
-    Optional<Entry> findByPathEntity(Long workspaceId, String path);
-    List<EntryResponseDTO> findChildren(Long parentId);
+    List<EntryResponseDTO> findChildrenDTO(Long parentId);
 }
