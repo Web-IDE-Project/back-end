@@ -1,0 +1,5 @@
+spring:
+  profiles:
+    group:
+      "devEnv": "common,dev"
+      "prodEnv": "common,prod"

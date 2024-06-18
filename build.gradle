@@ -32,6 +32,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.hibernate:hibernate-core:6.5.2.Final'
+
+    // AWS S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.2.8'
     implementation 'com.github.docker-java:docker-java-transport-okhttp:3.2.8'
