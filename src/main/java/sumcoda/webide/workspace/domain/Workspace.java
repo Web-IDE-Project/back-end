@@ -48,15 +48,15 @@ public class Workspace {
     private Boolean isPublic;
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace", cascade = CascadeType.REMOVE)
     private List<MemberWorkspace> memberWorkspaces = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace", cascade = CascadeType.REMOVE)
     private List<Entry> entries = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToOne(mappedBy = "workspace")
+    @OneToOne(mappedBy = "workspace", cascade = CascadeType.REMOVE)
     private ChatRoom chatRoom;
 
     @Column(nullable = false)
