@@ -405,6 +405,26 @@ public class WorkspaceService {
         workspace.updateCategories(Set.of(Category.MY));
     }
 
+    // 워크스페이스 삭제
+    @Transactional
+    public void deleteWorkspace(Long workspaceId, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인(ADMIN 만 워크스페이스를 삭제할 수 있음)
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 상태가 DEFAULT 인 워크스페이스만 삭제할 수 있음
+        if (workspace.getStatus() != Status.DEFAULT) {
+            throw new WorkspaceStatusException("완료되거나 해결된 컨테이너는 삭제할 수 없습니다.");
+        }
+
+        // 워크 스페이스 삭제
+        workspaceRepository.delete(workspace);
+    }
+
     // 유저가 워크스페이스에 접근 권한이 존재하는지 확인
     private void checkUserAccessToWorkspace(Workspace workspace, String username) {
 

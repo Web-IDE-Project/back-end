@@ -178,4 +178,26 @@ public class WorkspaceController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 워크 스페이스 삭제
+    @DeleteMapping("/{workspaceId}")
+    public ResponseEntity<?> deleteWorkspace(@PathVariable Long workspaceId, Authentication authentication) {
+
+        String username = "";
+
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
+
+        workspaceService.deleteWorkspace(workspaceId, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "워크스페이스가 삭제되었습니다.");
+
+        return ResponseEntity.ok(response);
+    }
 }
