@@ -1,10 +1,13 @@
 package sumcoda.webide.member.service;
 
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sumcoda.webide.common.config.AWSS3Config;
 import sumcoda.webide.member.domain.Member;
 import sumcoda.webide.member.domain.ProfileImage;
 import sumcoda.webide.member.dto.FileDTO;
@@ -22,6 +25,13 @@ public class MemberService {
 
     // 멤버를 조회하기 위한 필드
     private final MemberRepository memberRepository;
+
+    // AWS S3 활용을 위해 필요한 설정 클래스
+    private final AWSS3Config awss3Config;
+
+    // S3에 등록된 버킷 이름
+    @Value("${cloud.aws.s3.bucket-name}")
+    private String bucketName;
 
     @Transactional
     public void updateMemberInfos(String username, UpdateMemberRequestDTO updateMemberRequestDTO, MultipartFile profileImage) {
@@ -44,18 +54,37 @@ public class MemberService {
         } else {
             try {
                 if (profileImage != null && !profileImage.isEmpty()) {
+
+
+//                    // 이미지 로컬 저장시 필요한것
+//                    FileDTO fileDTO = FileStorageUtil.saveFile(profileImage);
+//                    String originalFilename = fileDTO.getOriginalFilename();
+//                    String savedFilename = fileDTO.getSavedFilename();
+//                    String fullLocalPath = FileStorageUtil.getLocalStoreDir(savedFilename);
+//                    member.assignProfileImage(
+//                            ProfileImage.createProfileImage(
+//                                    originalFilename,
+//                                    savedFilename,
+//                                    fullLocalPath));
+
+//                  // 이미지 S3 저장시 필요한것
                     FileDTO fileDTO = FileStorageUtil.saveFile(profileImage);
+
                     String originalFilename = fileDTO.getOriginalFilename();
                     String savedFilename = fileDTO.getSavedFilename();
-                    String fullLocalPath = FileStorageUtil.getLocalStoreDir(savedFilename);
-//                    File file = fileDTO.getFile();
-//
+                    File file = fileDTO.getFile();
+
+                    // S3에 이미지 저장
+                    awss3Config.amazonS3Client().putObject(new PutObjectRequest(bucketName, savedFilename, file));
+                    // 클라이언트가 해당 이미지를 요청할 수 있는 URL
+                    String awsS3URL = awss3Config.amazonS3Client().getUrl(bucketName, savedFilename).toString();
+
                     member.assignProfileImage(
                             ProfileImage.createProfileImage(
                                     originalFilename,
                                     savedFilename,
-                                    fullLocalPath));
-//                file.delete();
+                                    awsS3URL));
+                    file.delete();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
