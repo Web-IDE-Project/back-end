@@ -23,7 +23,7 @@ public class TerminalController {
      * @param session HTTP 세션
      * @return 명령어 실행 결과
      */
-    @PostMapping("/api/{workspaceId}/terminal/execute")
+    @PostMapping("/api/workspaces/{workspaceId}/terminal/execute")
     public ResponseEntity<?> executeCommand(@PathVariable Long workspaceId, @RequestBody CommandRequestDTO commandRequestDTO, HttpSession session) throws IOException, InterruptedException {
         Map<String, Object> responseData = new HashMap<>();
 
