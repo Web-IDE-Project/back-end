@@ -117,4 +117,34 @@ public class Workspace {
             chatRoom.assignWorkspace(this);
         }
     }
+
+    // 워크스페이스 제목 수정 메서드
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    // 워크스페이스 설명 수정 메서드
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+    // 워크스페이스 공개, 비공개 수정 메서드
+    public void updateIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
+    // 워크스페이스 카테고리 추가 메서드
+    public void addCategories(Category categories) {
+        this.categories.add(categories);
+    }
+
+    // 워크스페이스 카테고리 제거 메서드
+    public void removeCategories(Category categories) {
+        this.categories.remove(categories);
+    }
+
+    // 워크스페이스 카테고리 업데이트 메서드
+    public void updateCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
 }
