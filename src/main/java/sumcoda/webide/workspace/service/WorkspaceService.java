@@ -128,6 +128,7 @@ public class WorkspaceService {
      * @param workspaceId Controller 에서 전달받은 워크스페이스 id
      **/
     //워크스페이스 실행
+    @Transactional
     public WorkspaceEntriesResponseDTO getAllEntriesByWorkspaceId(Long workspaceId, String username) {
         //유저 검증
         validateUserAccess(workspaceId, username);
@@ -187,7 +188,6 @@ public class WorkspaceService {
         return workspaceRepository.findWorkspaceAccessInfo(workspaceId, username);
     }
 
-    @Transactional(readOnly = true)
     public List<?> getWorkspacesByCategory(Category category, String username) {
         List<WorkspaceResponseDAO> workspaceResponseDAOList = workspaceRepository.findWorkspacesByCategory(category, username);
 
