@@ -48,15 +48,15 @@ public class Workspace {
     private Boolean isPublic;
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace", cascade = CascadeType.REMOVE)
     private List<MemberWorkspace> memberWorkspaces = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "workspace", cascade = CascadeType.REMOVE)
     private List<Entry> entries = new ArrayList<>();
 
     // 양방향 연관관계
-    @OneToOne(mappedBy = "workspace")
+    @OneToOne(mappedBy = "workspace", cascade = CascadeType.REMOVE)
     private ChatRoom chatRoom;
 
     @Column(nullable = false)
@@ -116,5 +116,35 @@ public class Workspace {
         if (chatRoom != null && chatRoom.getWorkspace() != this) {
             chatRoom.assignWorkspace(this);
         }
+    }
+
+    // 워크스페이스 제목 수정 메서드
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    // 워크스페이스 설명 수정 메서드
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+    // 워크스페이스 공개, 비공개 수정 메서드
+    public void updateIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
+    // 워크스페이스 카테고리 추가 메서드
+    public void addCategories(Category categories) {
+        this.categories.add(categories);
+    }
+
+    // 워크스페이스 카테고리 제거 메서드
+    public void removeCategories(Category categories) {
+        this.categories.remove(categories);
+    }
+
+    // 워크스페이스 카테고리 업데이트 메서드
+    public void updateCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 }
