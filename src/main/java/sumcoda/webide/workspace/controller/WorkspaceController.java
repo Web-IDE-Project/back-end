@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.web.bind.annotation.*;
 import sumcoda.webide.member.auth.social.CustomOAuth2User;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
+import sumcoda.webide.workspace.dto.request.WorkspaceUpdateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.service.WorkspaceService;
@@ -125,5 +126,30 @@ public class WorkspaceController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
+    }
+
+    // 워크 스페이스 수정
+    @PutMapping("/{workspaceId}")
+    public ResponseEntity<?> updateWorkspace(
+            @PathVariable Long workspaceId,
+            @RequestBody WorkspaceUpdateRequestDTO workspaceUpdateRequestDTO,
+            Authentication authentication) {
+
+        String username = "";
+
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+            username = oauthUser.getUsername();
+        } else {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = userDetails.getUsername();
+        }
+
+        workspaceService.updateWorkspace(workspaceId, workspaceUpdateRequestDTO, username);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "워크스페이스 정보가 수정되었습니다.");
+
+        return ResponseEntity.ok(response);
     }
 }

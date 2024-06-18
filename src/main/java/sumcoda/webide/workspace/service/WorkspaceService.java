@@ -3,6 +3,8 @@ package sumcoda.webide.workspace.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sumcoda.webide.chat.domain.ChatRoom;
+import sumcoda.webide.chat.repository.ChatRoomRepository;
 import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.entry.repository.EntryRepository;
 import sumcoda.webide.member.domain.Member;
@@ -13,13 +15,16 @@ import sumcoda.webide.memberworkspace.repository.MemberWorkspaceRepository;
 import sumcoda.webide.workspace.domain.Workspace;
 import sumcoda.webide.workspace.dto.WorkspaceAccessDTO;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
+import sumcoda.webide.workspace.dto.request.WorkspaceUpdateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDTO;
 import sumcoda.webide.workspace.enumerate.Category;
 import sumcoda.webide.workspace.enumerate.Status;
 import sumcoda.webide.workspace.exception.WorkspaceAccessException;
+import sumcoda.webide.workspace.exception.WorkspaceFoundException;
 import sumcoda.webide.workspace.exception.WorkspaceNotCreateException;
+import sumcoda.webide.workspace.exception.WorkspaceUpdateException;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 import java.time.LocalDateTime;
@@ -38,6 +43,8 @@ public class WorkspaceService {
     private final MemberWorkspaceRepository memberWorkspaceRepository;
 
     private final EntryRepository entryRepository;
+
+    private final ChatRoomRepository chatRoomRepository;
 
     /**
      * 워크스페이스 생성 요청 캐치
@@ -205,6 +212,104 @@ public class WorkspaceService {
                             .awsS3SavedFileURL(data.getAwsS3SavedFileURL())
                             .build())
                     .toList();
+        }
+    }
+
+    // 워크 스페이스 수정
+    @Transactional
+    public void updateWorkspace(Long workspaceId, WorkspaceUpdateRequestDTO workspaceUpdateRequestDTO, String username) {
+
+        // 워크스페이스가 존재하는지 확인
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
+
+        // 유저가 워크스페이스에 권한이 존재하는지 확인( ADMIN 만 워크스페이스를 수정할 수 있음)
+        checkUserAccessToWorkspace(workspace, username);
+
+        // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
+        if (workspace.getStatus() != Status.DEFAULT) {
+            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+        }
+
+        // 워크스페이스의 제목을 업데이트
+        workspace.updateTitle(workspaceUpdateRequestDTO.getTitle());
+        // 워크스페이스의 설명을 업데이트
+        workspace.updateDescription(workspaceUpdateRequestDTO.getDescription());
+
+        // 입력받은 카테고리
+        Category newCategory = workspaceUpdateRequestDTO.getCategory();
+
+        // 나의 -> 강의, 질문 -> 강의, 강의 -> 강의
+        // 3가지 경우의 수를 고려
+
+        // 카테고리가 강의 카테고리라면
+        if (newCategory == Category.LECTURE) {
+            if (!workspace.getCategories().contains(Category.LECTURE)) {
+
+                // 기존에 질문 컨테이너가 있으면 질문 카테고리를 제거
+                if(workspace.getCategories().contains(Category.QUESTION)) {
+                    workspace.removeCategories(Category.QUESTION);
+                }
+                // private -> public
+                workspace.updateIsPublic(true);
+                // 강의 카테고리 추가
+                workspace.addCategories(newCategory);
+
+                // 채팅방 생성
+                if (workspace.getChatRoom() == null) {
+                    ChatRoom chatRoom = ChatRoom.createChatRoom(workspace.getTitle(), workspace);
+                    chatRoomRepository.save(chatRoom);
+                }
+            }
+
+            // 나의 -> 질문, 질문 -> 질문, 강의 -> 질문
+            // 3가지 경우의 수를 고려
+
+            // 카테고리가 질문 카테고리라면
+        } else if (newCategory == Category.QUESTION) {
+            if (!workspace.getCategories().contains(Category.QUESTION)) {
+
+                // 기존에 강의 카테고리가 있으면 강의 카테고리를 제거
+                if (workspace.getCategories().contains(Category.LECTURE)) {
+                    workspace.removeCategories(Category.LECTURE);
+                }
+                // private -> public
+                workspace.updateIsPublic(true);
+                // 질문 카테고리 추가
+                workspace.addCategories(newCategory);
+
+                // 채팅방 생성
+                if (workspace.getChatRoom() == null) {
+                    ChatRoom chatRoom = ChatRoom.createChatRoom(workspace.getTitle(), workspace);
+                    chatRoomRepository.save(chatRoom);
+                }
+            }
+
+            // 나의 -> 나의, 질문 -> 나의, 강의 -> 나의
+            // 3가지 경우의 수를 고려
+
+            // 카테고리가 나의 카테고리라면
+        } else if (newCategory == Category.MY) {
+
+            // 기존에 강의 또는 질문 카테고리 였으면 강의 또는 질문 카테고리를 제거
+            if (workspace.getCategories().contains(Category.LECTURE) || workspace.getCategories().contains(Category.QUESTION)) {
+                workspace.updateCategories(Set.of(Category.MY));
+            }
+
+            workspace.updateIsPublic(false);
+        }
+    }
+
+    // 유저가 워크스페이스에 접근 권한이 존재하는지 확인
+    private void checkUserAccessToWorkspace(Workspace workspace, String username) {
+
+        boolean hasAccess = workspace.getMemberWorkspaces().stream()
+                .anyMatch(mw -> mw.getMember().getUsername().equals(username) &&
+                        mw.getRole().equals(MemberWorkspaceRole.ADMIN));
+
+        // 접근 권한이 없으면 예외 발생
+        if (!hasAccess) {
+            throw new WorkspaceAccessException("유저는 워크스페이스에 접근 권한이 없습니다.: " + username);
         }
     }
 
