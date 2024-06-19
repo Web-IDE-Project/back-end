@@ -12,8 +12,10 @@ import sumcoda.webide.entry.repository.EntryRepository;
 import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
 import sumcoda.webide.workspace.domain.Workspace;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
+import sumcoda.webide.workspace.enumerate.Status;
 import sumcoda.webide.workspace.exception.WorkspaceAccessException;
 import sumcoda.webide.workspace.exception.WorkspaceFoundException;
+import sumcoda.webide.workspace.exception.WorkspaceUpdateException;
 import sumcoda.webide.workspace.repository.WorkspaceRepository;
 
 
@@ -35,8 +37,13 @@ public class EntryService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
 
-        // 유저가 워크스페이스에 권한이 존재하는지 확인
-        checkUserAccessToWorkspace(workspace, username);
+        // 유저가 엔트리에 권한이 존재하는지 확인
+        checkUserAccessToEntry(workspace, username);
+
+        // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
+        if (workspace.getStatus() != Status.DEFAULT) {
+            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+        }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
         Entry parentEntry = entryRepository.findByWorkspaceIdAndId(workspaceId, parentId)
@@ -83,8 +90,13 @@ public class EntryService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
 
-        // 유저가 워크스페이스에 권한이 존재하는지 확인
-        checkUserAccessToWorkspace(workspace, username);
+        // 유저가 엔트리에 권한이 존재하는지 확인
+        checkUserAccessToEntry(workspace, username);
+
+        // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
+        if (workspace.getStatus() != Status.DEFAULT) {
+            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+        }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
         Entry entry = entryRepository.findByWorkspaceIdAndId(workspaceId, entryId)
@@ -113,8 +125,13 @@ public class EntryService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
 
-        // 유저가 워크스페이스에 권한이 존재하는지 확인
-        checkUserAccessToWorkspace(workspace, username);
+        // 유저가 엔트리에 권한이 존재하는지 확인
+        checkUserAccessToEntry(workspace, username);
+
+        // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
+        if (workspace.getStatus() != Status.DEFAULT) {
+            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+        }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
         Entry entry = entryRepository.findByWorkspaceIdAndId(workspaceId, entryId)
@@ -154,8 +171,13 @@ public class EntryService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new WorkspaceFoundException("존재하지 않는 워크스페이스 Id 입니다.: " + workspaceId));
 
-        // 유저가 워크스페이스에 권한이 존재하는지 확인
-        checkUserAccessToWorkspace(workspace, username);
+        // 유저가 엔트리에 권한이 존재하는지 확인
+        checkUserAccessToEntry(workspace, username);
+
+        // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
+        if (workspace.getStatus() != Status.DEFAULT) {
+            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+        }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
         Entry entry = entryRepository.findByWorkspaceIdAndId(workspaceId, entryId)
@@ -173,16 +195,16 @@ public class EntryService {
 
     // 공통 메서드
 
-    // 유저가 워크스페이스에 접근 권한이 존재하는지 확인
-    private void checkUserAccessToWorkspace(Workspace workspace, String username) {
+    // 유저가 엔트리에 접근 권한이 존재하는지 확인
+    private void checkUserAccessToEntry(Workspace workspace, String username) {
 
         boolean hasAccess = workspace.getMemberWorkspaces().stream()
                 .anyMatch(mw -> mw.getMember().getUsername().equals(username) &&
-                        mw.getRole().equals(MemberWorkspaceRole.ADMIN));
+                        (mw.getRole().equals(MemberWorkspaceRole.ADMIN) || mw.getRole().equals(MemberWorkspaceRole.VIEWER)));
 
         // 접근 권한이 없으면 예외 발생
         if (!hasAccess) {
-            throw new WorkspaceAccessException("유저는 워크스페이스에 접근 권한이 없습니다.: " + username);
+            throw new WorkspaceAccessException("유저는 엔트리에 접근 권한이 없습니다.: " + username);
         }
     }
 }
