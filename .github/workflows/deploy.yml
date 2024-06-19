@@ -33,6 +33,11 @@ jobs:
           echo ${DOCKERHUB_ACCESS_TOKEN} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
           docker push ${DOCKERHUB_USERNAME}/webide3ever:latest
 
+      - name: Add SSH Key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Deploy to EC2
         env:
           PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
