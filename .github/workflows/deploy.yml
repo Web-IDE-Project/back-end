@@ -1,0 +1,71 @@
+name: Deploy Spring Boot App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./gradlew build -Dspring.profiles.active=prod,common
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${DOCKERHUB_USERNAME}/webide3ever:latest .
+          docker tag ${DOCKERHUB_USERNAME}/webide3ever:latest ${DOCKERHUB_USERNAME}/webide3ever:latest
+          echo ${DOCKERHUB_ACCESS_TOKEN} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
+          docker push ${DOCKERHUB_USERNAME}/webide3ever:latest
+
+      - name: Deploy to EC2
+        env:
+          PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
+          PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
+          PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          PROD_S3_BUCKET_NAME: ${{ secrets.PROD_S3_BUCKET_NAME }}
+          PROD_AWS_ACCESS_KEY: ${{ secrets.PROD_AWS_ACCESS_KEY }}
+          PROD_AWS_SECRET_KEY: ${{ secrets.PROD_AWS_SECRET_KEY }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          docker pull ${DOCKERHUB_USERNAME}/webide3ever:latest
+          docker stop springboot || true
+          docker rm springboot || true
+          docker run -d --name springboot \
+            -e SPRING_PROFILES_ACTIVE=prod,common \
+            -e DB_URL=${PROD_DB_URL} \
+            -e DB_USERNAME=${PROD_DB_USERNAME} \
+            -e DB_PASSWORD=${PROD_DB_PASSWORD} \
+            -e S3_BUCKET_NAME=${PROD_S3_BUCKET_NAME} \
+            -e AWS_ACCESS_KEY=${PROD_AWS_ACCESS_KEY} \
+            -e AWS_SECRET_KEY=${PROD_AWS_SECRET_KEY} \
+            -e NAVER_CLIENT_ID=${NAVER_CLIENT_ID} \
+            -e NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET} \
+            -e GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
+            -e GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
+            -e KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID} \
+            -e KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET} \
+            -p 80:80 ${DOCKERHUB_USERNAME}/webide3ever:latest
+          EOF
