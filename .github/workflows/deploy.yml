@@ -28,10 +28,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${DOCKERHUB_USERNAME}/webide3ever:latest .
-          docker tag ${DOCKERHUB_USERNAME}/webide3ever:latest ${DOCKERHUB_USERNAME}/webide3ever:latest
-          echo ${DOCKERHUB_ACCESS_TOKEN} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
-          docker push ${DOCKERHUB_USERNAME}/webide3ever:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest .
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+          echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
 
       - name: Add SSH Key
         uses: webfactory/ssh-agent@v0.5.3
@@ -56,7 +56,9 @@ jobs:
           DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-          sudo docker pull ${DOCKERHUB_USERNAME}/webide3ever:latest
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+          sudo docker stop web-ide-3ever || true
+          sudo docker rm web-ide-3ever || true
           sudo docker run -d --name web-ide-3ever \
             -e SPRING_PROFILES_ACTIVE=prod,common \
             -e DB_URL=${PROD_DB_URL} \
@@ -71,7 +73,5 @@ jobs:
             -e GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
             -e KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID} \
             -e KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET} \
-            -p 80:80 ${DOCKERHUB_USERNAME}/webide3ever:latest
-          sudo docker stop web-ide-3ever || true
-          sudo docker rm web-ide-3ever || true
+            -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
           EOF
