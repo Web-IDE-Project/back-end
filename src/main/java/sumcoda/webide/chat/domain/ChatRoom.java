@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.workspace.domain.Workspace;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public class ChatRoom {
     private Workspace workspace;
 
     // 양방향 연관관계
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom", cascade = CascadeType.REMOVE)
     private List<ChatMessage> chatMessages;
 
     @Builder
