@@ -42,7 +42,7 @@ public class EntryService {
 
         // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
         if (workspace.getStatus() != Status.DEFAULT) {
-            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+            throw new EntryUpdateException("완료된 컨테이너나 해결된 컨테이너의 엔트리를 수정할 수 없습니다.");
         }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
@@ -95,7 +95,7 @@ public class EntryService {
 
         // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
         if (workspace.getStatus() != Status.DEFAULT) {
-            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+            throw new EntryUpdateException("완료된 컨테이너나 해결된 컨테이너의 엔트리를 수정할 수 없습니다.");
         }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
@@ -130,7 +130,7 @@ public class EntryService {
 
         // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
         if (workspace.getStatus() != Status.DEFAULT) {
-            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+            throw new EntryUpdateException("완료된 컨테이너나 해결된 컨테이너의 엔트리를 수정할 수 없습니다.");
         }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
@@ -176,7 +176,7 @@ public class EntryService {
 
         // 상태가 DEFAULT 가 아니면 워크스페이스를 수정할 수 없음
         if (workspace.getStatus() != Status.DEFAULT) {
-            throw new WorkspaceUpdateException("완료된 컨테이너나 해결된 컨테이너는 수정할 수 없습니다.");
+            throw new EntryUpdateException("완료된 컨테이너나 해결된 컨테이너의 엔트리를 수정할 수 없습니다.");
         }
 
         // 워크스페이스 안에 엔트리가 존재하는지 확인
