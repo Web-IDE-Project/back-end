@@ -50,9 +50,7 @@ jobs:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > MainProdKey.pem
-          chmod 400 MainProdKey.pem
-          ssh -i MainProdKey.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           docker pull ${DOCKERHUB_USERNAME}/webide3ever:latest
           docker stop springboot || true
           docker rm springboot || true
@@ -72,4 +70,3 @@ jobs:
             -e KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET} \
             -p 80:80 ${DOCKERHUB_USERNAME}/webide3ever:latest
           EOF
-          rm MainProdKey.pem
