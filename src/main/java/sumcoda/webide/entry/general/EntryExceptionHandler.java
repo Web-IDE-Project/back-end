@@ -62,4 +62,11 @@ public class EntryExceptionHandler {
         response.put("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(EntryUpdateException.class)
+    public ResponseEntity<Map<String, Object>> EntryUpdateExceptionHandler(EntryUpdateException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }
