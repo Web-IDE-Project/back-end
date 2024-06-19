@@ -57,9 +57,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           sudo docker pull ${DOCKERHUB_USERNAME}/webide3ever:latest
-          sudo docker stop ${DOCKERHUB_USERNAME}/webide3ever:latest || true
-          sudo docker rm ${DOCKERHUB_USERNAME}/webide3ever:latest || true
-          sudo docker run -d --name ${DOCKERHUB_USERNAME}/webide3ever:latest \
+          sudo docker run -d --name web-ide-3ever \
             -e SPRING_PROFILES_ACTIVE=prod,common \
             -e DB_URL=${PROD_DB_URL} \
             -e DB_USERNAME=${PROD_DB_USERNAME} \
@@ -74,4 +72,6 @@ jobs:
             -e KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID} \
             -e KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET} \
             -p 80:80 ${DOCKERHUB_USERNAME}/webide3ever:latest
+          sudo docker stop web-ide-3ever || true
+          sudo docker rm web-ide-3ever || true
           EOF
