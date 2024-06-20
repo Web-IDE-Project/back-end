@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import sumcoda.webide.entry.domain.Entry;
 import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
-import sumcoda.webide.workspace.dto.WorkspaceAccessDTO;
+import sumcoda.webide.workspace.dto.WorkspacePublicStatusDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.enumerate.Category;
@@ -46,19 +46,14 @@ public class WorkspaceRepositoryCustomImpl implements WorkspaceRepositoryCustom 
      * 워크스페이스 공개 여부와 역할을 통해 접근 권한이 있는지 확인하는 메서드
      *
      * @param workspaceId 워크스페이스 ID
-     * @param username 사용자명
      * @return 워크스페이스 접근 정보를 담은 DTO
      **/
     @Override
-    public WorkspaceAccessDTO findWorkspaceAccessInfo(Long workspaceId, String username) {
-        return jpaQueryFactory.select(Projections.fields(WorkspaceAccessDTO.class,
-                        memberWorkspace.role,
+    public WorkspacePublicStatusDTO findWorkspacePublicInfo(Long workspaceId) {
+        return jpaQueryFactory.select(Projections.fields(WorkspacePublicStatusDTO.class,
                         workspace.isPublic))
                 .from(workspace)
-                .leftJoin(workspace.memberWorkspaces, memberWorkspace) // 워크스페이스와 연관된 멤버워크스페이스 조인
-                .leftJoin(memberWorkspace.member, member) // 멤버워크스페이스와 연관된 멤버 조인
-                .where(workspace.id.eq(workspaceId) // 워크스페이스 id가 일치하고
-                        .and(member.username.eq(username))) // 멤버 username이 일치하는 조건
+                .where(workspace.id.eq(workspaceId)) // 워크스페이스 id가 일치하는 조건
                 .fetchOne();
     }
 
