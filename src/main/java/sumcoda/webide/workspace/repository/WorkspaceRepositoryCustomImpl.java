@@ -93,6 +93,7 @@ public class WorkspaceRepositoryCustomImpl implements WorkspaceRepositoryCustom 
                         workspace.language,
                         workspace.description,
                         workspace.status,
+                        member.username,
                         member.nickname,
                         profileImage.awsS3SavedFileURL
                 ))
