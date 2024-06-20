@@ -17,7 +17,7 @@ import sumcoda.webide.memberworkspace.domain.MemberWorkspace;
 import sumcoda.webide.memberworkspace.enumerate.MemberWorkspaceRole;
 import sumcoda.webide.memberworkspace.repository.MemberWorkspaceRepository;
 import sumcoda.webide.workspace.domain.Workspace;
-import sumcoda.webide.workspace.dto.WorkspaceAccessDTO;
+import sumcoda.webide.workspace.dto.WorkspacePublicStatusDTO;
 import sumcoda.webide.workspace.dto.request.WorkspaceCreateRequestDTO;
 import sumcoda.webide.workspace.dto.request.WorkspaceUpdateRequestDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
@@ -138,54 +138,26 @@ public class WorkspaceService {
 
 
     /**
-     * 유저의 role을 확인하고 유저가 워크스페이스에 접근 권한이 있는지 확인하는 메서드
+     * 워크스페이스의 공개 여부를 확인하고 유저가 워크스페이스에 접근 권한이 있는지 확인하는 메서드
      *
      * @param workspaceId 워크스페이스 ID
      * @param username 사용자명
      **/
     private void validateUserAccess(Long workspaceId, String username) {
-        WorkspaceAccessDTO workspaceAccessDTO = workspaceRepository.findWorkspaceAccessInfo(workspaceId, username);
+        WorkspacePublicStatusDTO workspacePublicStatusDTO = workspaceRepository.findWorkspacePublicInfo(workspaceId);
 
-        // 워크스페이스 실행 시 참여하는 유저가 역할이 없으면 viewer 권한 설정
-        if (workspaceAccessDTO == null)
-        {
-            workspaceAccessDTO = assignViewerRole(workspaceId, username);
+        // 퍼블릭 워크스페이스 실행 시 유저 검증 없이 바로 실행
+        if (workspacePublicStatusDTO.isPublic()) {
+            return;
         }
 
-        // private 워크스페이스일 때, admin이 아닌 유저가 접근하려고 하면 예외 발생
-        if (!workspaceAccessDTO.isPublic() && workspaceAccessDTO.getRole() != MemberWorkspaceRole.ADMIN)
-        {
-            throw new WorkspaceAccessException("해당 컨테이너에 접근 권한이 없습니다.: " + username);
+        // 프라이빗 워크스페이스일 때, 유저가 해당 워크스페이스에 접근 권한이 없으면 예외 발생
+        if (!workspacePublicStatusDTO.isPublic()) {
+            boolean hasAccess = workspaceRepository.hasUserAccess(workspaceId, username);
+            if (!hasAccess) {
+                throw new WorkspaceAccessException("해당 컨테이너에 접근 권한이 없습니다.: " + username);
+            }
         }
-
-        // 유저가 해당 워크스페이스에 접근 권한이 없으면 예외 발생
-        if (Objects.equals(Boolean.TRUE,
-                !workspaceRepository.hasUserAccess(workspaceId, username)))
-        {
-            throw new WorkspaceAccessException("해당 컨테이너에 접근 권한이 없습니다.: " + username);
-        }
-    }
-
-    /**
-     * 퍼블릭 워크스페이스에 참여하는 다른 사용자들에게 자동으로 viewer 권한을 부여하는 메서드
-     *
-     * @param workspaceId 워크스페이스 ID
-     * @param username 사용자명
-     **/
-    private WorkspaceAccessDTO assignViewerRole(Long workspaceId, String username) {
-
-        MemberWorkspace memberWorkspace = MemberWorkspace.createMemberWorkspace(
-                MemberWorkspaceRole.VIEWER,
-                LocalDateTime.now(),
-                memberRepository.findByUsername(username)
-                        .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다.")),
-                workspaceRepository.findById(workspaceId)
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 워크스페이스입니다."))
-        );
-
-        memberWorkspaceRepository.save(memberWorkspace);
-
-        return workspaceRepository.findWorkspaceAccessInfo(workspaceId, username);
     }
 
     public List<?> getWorkspacesByCategory(Category category, String username) {

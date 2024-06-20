@@ -1,6 +1,6 @@
 package sumcoda.webide.workspace.repository;
 
-import sumcoda.webide.workspace.dto.WorkspaceAccessDTO;
+import sumcoda.webide.workspace.dto.WorkspacePublicStatusDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceEntriesResponseDTO;
 import sumcoda.webide.workspace.dto.response.WorkspaceResponseDAO;
 import sumcoda.webide.workspace.enumerate.Category;
@@ -13,7 +13,7 @@ public interface WorkspaceRepositoryCustom {
 
     List<WorkspaceResponseDAO> findWorkspacesByCategory(Category category, String username);
 
-    WorkspaceAccessDTO findWorkspaceAccessInfo(Long workspaceId, String username);
+    WorkspacePublicStatusDTO findWorkspacePublicInfo(Long workspaceId);
 
     Boolean hasUserAccess(Long workspaceId, String username);
 }

@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum MemberWorkspaceRole {
 
-    ADMIN("ADMIN"),
-    EDITOR("EDITOR"),
-    VIEWER("VIEWER");
+    ADMIN("ADMIN");
 
     private final String value;
 }
