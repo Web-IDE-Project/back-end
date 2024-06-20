@@ -197,15 +197,6 @@ public class EntryService {
     // 유저가 엔트리에 접근 권한이 존재하는지 확인
     private void checkUserAccessToEntry(Workspace workspace, String username) {
 
-        boolean hasAccess = workspace.getMemberWorkspaces().stream()
-                .anyMatch(mw -> mw.getMember().getUsername().equals(username) &&
-                        (mw.getRole().equals(MemberWorkspaceRole.ADMIN) || mw.getRole().equals(MemberWorkspaceRole.VIEWER)));
-
-        // 접근 권한이 없으면 예외 발생
-        if (!hasAccess) {
-            throw new WorkspaceAccessException("해당 컨테이너에 접근 권한이 없습니다.: " + username);
-        }
-
         // private 워크스페이스일 때, Admin 이 아닌 유저가 접근하려고 하면 예외 발생
         if (!workspace.getIsPublic()) {
             boolean isAdmin = workspace.getMemberWorkspaces().stream()
