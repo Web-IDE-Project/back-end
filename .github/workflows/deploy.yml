@@ -57,8 +57,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
-          sudo docker stop web-ide-3ever || true
-          sudo docker rm web-ide-3ever || true
+          if [ $(sudo docker ps -a -q -f name=web-ide-3ever) ]; then
+              sudo docker stop web-ide-3ever
+              sudo docker rm web-ide-3ever
+          fi
           sudo docker run -d --name web-ide-3ever \
             -e SPRING_PROFILES_ACTIVE=prod,common \
             -e DB_URL=${PROD_DB_URL} \
