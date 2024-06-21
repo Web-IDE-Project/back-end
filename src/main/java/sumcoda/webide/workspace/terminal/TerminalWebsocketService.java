@@ -68,6 +68,12 @@ public class TerminalWebsocketService {
         } else {
           return "Invalid command: touch requires a file name";
         }
+      case "rm":
+        if (parts.length > 1) {
+          return remove(workspaceId, parts[1], currentPath);
+        } else {
+          return "Invalid command: rm requires a file or directory name";
+        }
       default:
         return handleCompileAndRunCommand(workspaceId, command, currentPath);
     }
@@ -160,6 +166,41 @@ public class TerminalWebsocketService {
     entryRepository.save(newEntry);
 
     return "File created: " + newFileName;
+  }
+
+  /**
+   * 파일 또는 디렉토리를 삭제하는 메서드
+   *
+   * @param workspaceId 워크스페이스 ID
+   * @param fileName 파일 또는 디렉토리 이름
+   * @param currentPath 현재 경로
+   * @return 삭제 결과 메시지
+   */
+  private String remove(Long workspaceId, String fileName, String currentPath) {
+    String resolvedPath = resolvePath(currentPath, fileName);
+    Optional<Entry> targetEntry = getEntryByPath(workspaceId, resolvedPath);
+
+    if (targetEntry.isPresent()) {
+      Entry entry = targetEntry.get();
+      deleteEntry(entry);
+      return (Boolean.TRUE.equals(entry.getIsDirectory()) ? "Directory" : "File") + " deleted: " + resolvedPath;
+    } else {
+      return "File or directory not found in the current path.";
+    }
+  }
+
+  /**
+   * 주어진 엔트리를 삭제하고, 디렉토리인 경우 하위 엔트리도 모두 삭제
+   *
+   * @param entry 삭제할 엔트리
+   */
+  private void deleteEntry(Entry entry) {
+    if (Boolean.TRUE.equals(entry.getIsDirectory())) {
+      for (Entry child : entry.getChildren()) {
+        deleteEntry(child);
+      }
+    }
+    entryRepository.deleteById(entry.getId());
   }
 
   /**
