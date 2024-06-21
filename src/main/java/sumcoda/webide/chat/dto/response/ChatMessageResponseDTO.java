@@ -12,12 +12,14 @@ public class ChatMessageResponseDTO {
   private String message;
   private MessageType messageType;
   private String senderName;
+  private String senderProfileImageUrl;
 
   @Builder
-  public ChatMessageResponseDTO(String message, MessageType messageType, String senderName) {
+  public ChatMessageResponseDTO(String message, MessageType messageType, String senderName, String senderProfileImageUrl) {
     this.message = message;
     this.messageType = messageType;
     this.senderName = senderName;
+    this.senderProfileImageUrl = senderProfileImageUrl;
   }
 
   public static ChatMessageResponseDTO from(ChatMessage chatMessage) {
@@ -25,6 +27,9 @@ public class ChatMessageResponseDTO {
             .message(chatMessage.getMessage())
             .messageType(chatMessage.getMessageType())
             .senderName(chatMessage.getMember().getNickname())
+            .senderProfileImageUrl(chatMessage.getMember().getProfileImage() != null ?
+                    chatMessage.getMember().getProfileImage().getAwsS3SavedFileURL() :
+                    null)
             .build();
   }
 }
