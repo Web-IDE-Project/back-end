@@ -11,13 +11,15 @@ import sumcoda.webide.chat.enumerate.MessageType;
 public class ChatMessageResponseDTO {
   private String message;
   private MessageType messageType;
+  private String senderId;
   private String senderName;
   private String senderProfileImageUrl;
 
   @Builder
-  public ChatMessageResponseDTO(String message, MessageType messageType, String senderName, String senderProfileImageUrl) {
+  public ChatMessageResponseDTO(String message, MessageType messageType, String senderId, String senderName, String senderProfileImageUrl) {
     this.message = message;
     this.messageType = messageType;
+    this.senderId = senderId;
     this.senderName = senderName;
     this.senderProfileImageUrl = senderProfileImageUrl;
   }
@@ -26,6 +28,7 @@ public class ChatMessageResponseDTO {
     return ChatMessageResponseDTO.builder()
             .message(chatMessage.getMessage())
             .messageType(chatMessage.getMessageType())
+            .senderId(chatMessage.getMember().getUsername())
             .senderName(chatMessage.getMember().getNickname())
             .senderProfileImageUrl(chatMessage.getMember().getProfileImage() != null ?
                     chatMessage.getMember().getProfileImage().getAwsS3SavedFileURL() :
