@@ -66,9 +66,41 @@ public class SecurityConfig {
     }
 
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // 허용할 출처 설정
+        configuration.addAllowedOrigin("http://localhost:3000");
+
+        // 허용할 HTTP 메서드 설정
+        configuration.addAllowedMethod("GET");
+        configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("OPTIONS");
+        configuration.addAllowedMethod("DELETE");
+        configuration.addAllowedMethod("PUT");
+
+        // 허용할 헤더 설정
+        configuration.addAllowedHeader("Origin");
+        configuration.addAllowedHeader("Content-Type");
+        configuration.addAllowedHeader("Accept");
+        configuration.addAllowedHeader("Authorization");
+        configuration.addAllowedHeader("X-AUTH-TOKEN");
+        configuration.addAllowedHeader("Authorization_Refresh");
+
+        // 자격 증명 허용 설정
+        configuration.setAllowCredentials(true);
+
+        // 노출할 헤더 설정
+        configuration.addExposedHeader("Content-Type");
+        configuration.addExposedHeader("X-AUTH-TOKEN");
+        configuration.addExposedHeader("Authorization");
+        configuration.addExposedHeader("Authorization_Refresh");
+
+        // pre-flight 요청 캐싱 시간 설정
+        configuration.setMaxAge(1728000L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 //        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app", "http://localhost:3000"));
 //
 //        // 허용할 HTTP 메서드 설정
@@ -87,8 +119,8 @@ public class SecurityConfig {
 ////        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app"));
 //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 //        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
+        return source;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -98,7 +130,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-//                .cors((corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource())))
+                .cors((corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource())))
                 // 보안 컨텍스트의 저장 방식을 제어하는 설정
                 // 보안 컨텍스트가 명시적으로 저장될 때만 저장되도록 한다.
                 // 보안 컨텍스트가 실수로 변경되거나 저장되는 것을 방지하여 보안성을 높인다.
