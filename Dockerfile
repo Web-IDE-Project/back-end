@@ -76,7 +76,7 @@
 FROM openjdk:17-jdk-slim AS builder
 #WORKDIR /app
 #COPY . .
-#RUN ./gradlew build -x test
+RUN ./gradlew build -x test
 #
 ## Step 2: Spring Boot 애플리케이션 배포
 #FROM openjdk:17-jdk-slim
@@ -93,18 +93,27 @@ FROM openjdk:17-jdk-slim AS builder
 FROM openjdk:17-jdk-slim AS builder
 
 # Add a volume pointing to /tmp
-VOLUME /app
+WORKDIR /app
+
+COPY src ./src
+RUN ./gradlew build -x test
+
+
+## The application's jar file
+#ARG JAR_FILE=/app/build/libs/*.jar
+#
+## Add the application's jar to the container
+#ADD ${JAR_FILE} app.jar
+
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/*.jar /app/app.jar
+
 
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
-
-# The application's jar file
-ARG JAR_FILE=build/libs/*.jar
-
-# Add the application's jar to the container
-ADD ${JAR_FILE} app.jar
-
-COPY --from=builder /app/build/libs/*.jar /app/app.jar
 
 # Run the jar file
 ENTRYPOINT ["java","-jar","/app.jar"]
