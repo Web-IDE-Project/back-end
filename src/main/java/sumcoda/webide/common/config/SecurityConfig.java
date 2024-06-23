@@ -18,6 +18,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import sumcoda.webide.member.auth.CustomAccessDeniedHandler;
 import sumcoda.webide.member.auth.CustomAuthenticationEntryPoint;
@@ -30,7 +31,6 @@ import sumcoda.webide.member.auth.social.OAuth2AuthenticationFailureHandler;
 import sumcoda.webide.member.auth.social.OAuth2AuthenticationSuccessHandler;
 
 import java.util.Arrays;
-import java.util.List;
 
 
 @Configuration
@@ -68,12 +68,32 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://3ever.vercel.app"));
+//        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app"));
+//        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type"));
+//        configuration.addAllowedHeader("Content-Type");
+//        configuration.addAllowedHeader("X-AUTH-TOKEN");
+//        configuration.addAllowedHeader("Authorization");
+//        configuration.addAllowedHeader("Authorization_Refresh");
+//        configuration.addAllowedHeader("Access-Control-Allow-Origin");
+//        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
+//        configuration.setExposedHeaders(Arrays.asList("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh"));
+//        configuration.setAllowCredentials(true);
+
+        // 허용할 HTTP 메서드 설정
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type"));
-        configuration.addAllowedHeader("Access-Control-Allow-Origin");
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Authorization_Refresh"));
+
+        // 허용할 요청 헤더 설정
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type", "X-AUTH-TOKEN"));
+
+        // 클라이언트가 접근할 수 있도록 허용할 응답 헤더 설정
+        configuration.setExposedHeaders(Arrays.asList("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh"));
+
+        // 자격 증명을 포함한 요청 허용
         configuration.setAllowCredentials(true);
+
+        // 특정 도메인에서의 요청 허용
+        configuration.addAllowedOrigin("https://3ever.vercel.app");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -94,7 +114,7 @@ public class SecurityConfig {
                 .securityContext(securityContext -> securityContext
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
-//                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers("/api/**", "/oauth2/authorization/**").permitAll()
                         .anyRequest().authenticated())
 
