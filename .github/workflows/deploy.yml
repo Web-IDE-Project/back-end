@@ -66,12 +66,12 @@ jobs:
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
             -v /home/ubuntu/application-common.yml:/config/application-common.yml \
             -e SPRING_PROFILES_ACTIVE=prod,common \
-            -e DB_URL=${PROD_DB_URL} \
-            -e DB_USERNAME=${PROD_DB_USERNAME} \
-            -e DB_PASSWORD=${PROD_DB_PASSWORD} \
-            -e S3_BUCKET_NAME=${PROD_S3_BUCKET_NAME} \
-            -e AWS_ACCESS_KEY=${PROD_AWS_ACCESS_KEY} \
-            -e AWS_SECRET_KEY=${PROD_AWS_SECRET_KEY} \
+            -e PROD_DB_URL=${PROD_DB_URL} \
+            -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
+            -e PROD_DB_PASSWORD=${PROD_DB_PASSWORD} \
+            -e PROD_S3_BUCKET_NAME=${PROD_S3_BUCKET_NAME} \
+            -e PROD_AWS_ACCESS_KEY=${PROD_AWS_ACCESS_KEY} \
+            -e PROD_AWS_SECRET_KEY=${PROD_AWS_SECRET_KEY} \
             -e NAVER_CLIENT_ID=${NAVER_CLIENT_ID} \
             -e NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET} \
             -e GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
