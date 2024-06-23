@@ -27,10 +27,13 @@ jobs:
         run: ./gradlew build -Dspring.profiles.active=prod
 
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest .
-          echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest .
+
+      - name: Docker Login
+        run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
 
       - name: Add SSH Key
         uses: webfactory/ssh-agent@v0.5.3
@@ -54,7 +57,6 @@ jobs:
 
         run: |
           scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
-          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-common.yml
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
@@ -64,7 +66,6 @@ jobs:
           fi
           sudo docker run -d --name web-ide-3ever \
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
-            -v /home/ubuntu/application-common.yml:/config/application-common.yml \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e PROD_DB_URL=${PROD_DB_URL} \
             -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
