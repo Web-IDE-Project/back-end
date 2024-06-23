@@ -13,4 +13,6 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
 
     // parentEntry 와 name 을 비교하여 해당하는 Entry 엔티티를 조회하는 메서드
     Optional<Entry> findByParentAndName(Entry parent, String name);
+
+    Optional<Entry> findByWorkspaceIdAndParentIdAndName(Long workspaceId, Long parentId, String name);
 }
