@@ -24,7 +24,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: ./gradlew build -Dspring.profiles.active=prod,common
+        run: ./gradlew build -Dspring.profiles.active=prod
 
       - name: Build Docker image
         run: |
@@ -65,7 +65,7 @@ jobs:
           sudo docker run -d --name web-ide-3ever \
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
             -v /home/ubuntu/application-common.yml:/config/application-common.yml \
-            -e SPRING_PROFILES_ACTIVE=prod,common \
+            -e SPRING_PROFILES_ACTIVE=prod \
             -e PROD_DB_URL=${PROD_DB_URL} \
             -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
             -e PROD_DB_PASSWORD=${PROD_DB_PASSWORD} \
