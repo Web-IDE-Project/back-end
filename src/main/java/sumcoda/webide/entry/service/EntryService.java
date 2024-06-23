@@ -61,7 +61,7 @@ public class EntryService {
         }
 
         // 부모 디렉토리 안에 같은 이름의 엔트리가 존재하는지 확인
-        if (entryRepository.findByParentAndName(parentEntry, entryName).isPresent()) {
+        if (entryRepository.findByParentIdAndName(parentEntry.getId(), entryName).isPresent()) {
             throw new EntryAlreadyExistsException("같은 이름의 엔트리가 이미 존재합니다.: " + entryName);
         }
 
@@ -154,7 +154,7 @@ public class EntryService {
         }
 
         // 디렉토리 안에 같은 이름의 엔트리가 존재하는지 확인
-        if (entryRepository.findByParentAndName(entry.getParent(), newName).isPresent()) {
+        if (entryRepository.findByParentIdAndName(entry.getParent().getId(), newName).isPresent()) {
             throw new EntryAlreadyExistsException("같은 이름의 엔트리가 이미 존재합니다.: " + newName);
         }
 

@@ -1,5 +1,3 @@
-/// src/main/java/com/example/service/TerminalService.java
-
 package sumcoda.webide.workspace.terminal;
 
 
@@ -145,26 +143,23 @@ public class TerminalService {
     public String touch(Long workspaceId, String newFileName, String currentPath) {
 
         log.info("currentPath : " + currentPath);
-        Entry currentEntry = getEntryByPath(workspaceId, currentPath).orElse(null);
+        Optional<Entry> currentEntry = getEntryByPath(workspaceId, currentPath);
 
-        if (currentEntry == null || !currentEntry.getIsDirectory()) {
+        if (currentEntry.isEmpty() || !currentEntry.get().getIsDirectory()) {
             return "Path not found or not a directory";
         }
 
         // 현재 경로에 동일한 이름의 파일이나 디렉토리가 있는지 확인
-        Entry existingEntry = entryRepository.findByWorkspaceIdAndParentIdAndName(workspaceId, currentEntry.getId(), newFileName).orElse(null);
-        if (existingEntry == null) {
+        Optional<Entry> existingEntry = entryRepository.findByWorkspaceIdAndParentIdAndName(workspaceId, currentEntry.get().getId(), newFileName);
+        if (existingEntry.isPresent()) {
             return "File or directory with the same name already exists";
         }
 
         Workspace workspace = workspaceRepository.findById(workspaceId).orElse(null);
 
 
-        boolean isDirectory = true;
-        if (newFileName.contains(".")) {
-            isDirectory = false;
-        }
-        Entry newEntry = Entry.createEntry(newFileName, "", isDirectory, currentEntry, workspace);
+        boolean isDirectory = !newFileName.contains(".");
+        Entry newEntry = Entry.createEntry(newFileName, "", isDirectory, currentEntry.get(), workspace);
 
         entryRepository.save(newEntry);
 
