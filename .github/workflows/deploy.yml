@@ -24,7 +24,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: ./gradlew bootJar -Dspring.profiles.active=prod,common
+        run: ./gradlew build -Dspring.profiles.active=prod,common
 
       - name: Build Docker image
         run: |
