@@ -56,6 +56,7 @@ jobs:
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
 
         run: |
+          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
@@ -65,6 +66,7 @@ jobs:
           fi
           export PROD_DB_URL=$(echo $PROD_DB_URL_ENCODED | base64 --decode)
           sudo docker run -d --name web-ide-3ever \
+            -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e PROD_DB_URL=${PROD_DB_URL} \
             -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
