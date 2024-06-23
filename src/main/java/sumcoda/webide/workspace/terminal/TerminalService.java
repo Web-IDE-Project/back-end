@@ -150,7 +150,15 @@ public class TerminalService {
         if (currentEntry == null || !currentEntry.getIsDirectory()) {
             return "Path not found or not a directory";
         }
+
+        // 현재 경로에 동일한 이름의 파일이나 디렉토리가 있는지 확인
+        EntryResponseDTO existingEntry = entryRepository.findByWorkspaceIdAndParentIdAndNameDTO(workspaceId, currentEntry.getId(), newFileName).orElse(null);
+        if (existingEntry == null) {
+            return "File or directory with the same name already exists";
+        }
+
         Workspace workspace = workspaceRepository.findById(workspaceId).orElse(null);
+
 
         boolean isDirectory = true;
         if (newFileName.contains(".")) {

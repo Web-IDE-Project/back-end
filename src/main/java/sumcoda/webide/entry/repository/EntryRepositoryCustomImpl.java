@@ -20,7 +20,6 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-
     /**
      * 주어진 워크스페이스 ID로 루트 엔트리를 찾음
      *
@@ -29,12 +28,11 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
      */
     @Override
     public Optional<Entry> findRootByWorkspaceId(Long workspaceId) {
-        Entry rootEntry = jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(entry)
                 .where(entry.workspace.id.eq(workspaceId)
                         .and(entry.parent.isNull()))
-                .fetchOne();
-        return Optional.ofNullable(rootEntry);
+                .fetchOne());
     }
 
     /**
@@ -46,9 +44,8 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
      */
     @Override
     public Optional<Entry> findByPath(Long workspaceId, String path) {
-        // 이 메서드는 QueryDSL을 사용하여 경로를 기반으로 엔트리를 검색하는 로직을 구현해야 합니다.
-        // 예를 들어, 경로를 '/'로 구분하여 단계적으로 엔트리를 검색할 수 있습니다.
-        // 간단한 예제는 다음과 같습니다:
+        // 이 메서드는 QueryDSL을 사용하여 경로를 기반으로 엔트리를 검색하는 로직을 구현해야 한다.
+        // 예를 들어, 경로를 '/'로 구분하여 단계적으로 엔트리를 검색할 수 있다.
         String[] parts = path.split("/");
         Entry currentEntry = jpaQueryFactory
                 .selectFrom(entry)
@@ -81,7 +78,7 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
      */
     @Override
     public Optional<EntryResponseDTO> findRootByWorkspaceIdDTO(Long workspaceId) {
-        EntryResponseDTO rootEntry = jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(EntryResponseDTO.class,
                         entry.id,
                         entry.name,
@@ -92,8 +89,25 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
                 .from(entry)
                 .where(entry.workspace.id.eq(workspaceId)
                         .and(entry.parent.isNull()))
-                .fetchOne();
-        return Optional.ofNullable(rootEntry);
+                .fetchOne());
+    }
+
+    @Override
+    public Optional<EntryResponseDTO> findByWorkspaceIdAndParentIdAndNameDTO(Long workspaceId, Long parentId, String name) {
+
+        return Optional.ofNullable(jpaQueryFactory
+                .select(Projections.bean(EntryResponseDTO.class,
+                        entry.id,
+                        entry.name,
+                        entry.isDirectory,
+                        entry.parent.id,
+                        entry.workspace.id))
+                .from(entry)
+                .where(entry.workspace.id.eq(workspaceId)
+                        .and(entry.parent.id.eq(parentId))
+                        .and(entry.name.eq(name)))
+                .fetchOne());
+
     }
 
     /**
