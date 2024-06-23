@@ -84,7 +84,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         // 허용할 요청 헤더 설정
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type", "X-AUTH-TOKEN"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type", "X-AUTH-TOKEN", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
 
         // 클라이언트가 접근할 수 있도록 허용할 응답 헤더 설정
         configuration.setExposedHeaders(Arrays.asList("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh"));
