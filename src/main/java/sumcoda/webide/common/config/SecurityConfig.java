@@ -69,7 +69,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app"));
+        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app", "http://localhost:3000"));
 //        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type"));
 //        configuration.addAllowedHeader("Content-Type");

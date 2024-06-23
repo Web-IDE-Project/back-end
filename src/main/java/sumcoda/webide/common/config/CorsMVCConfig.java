@@ -9,7 +9,7 @@ public class CorsMVCConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://3ever.vercel.app")
+                .allowedOrigins("https://3ever.vercel.app", "http://localhost:3000")
                 .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용할 HTTP method
                 .allowedHeaders("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type", "X-AUTH-TOKEN", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
                 .exposedHeaders("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
