@@ -83,6 +83,9 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar /app/app.jar
 
+EXPOSE 8080
+EXPOSE 80
+
 # Spring Boot 애플리케이션 실행
 CMD ["java", "-jar", "/app/app.jar"]
 
