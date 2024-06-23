@@ -66,61 +66,61 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // 허용할 출처 설정
-        configuration.addAllowedOrigin("http://localhost:3000");
-
-        // 허용할 HTTP 메서드 설정
-        configuration.addAllowedMethod("GET");
-        configuration.addAllowedMethod("POST");
-        configuration.addAllowedMethod("OPTIONS");
-        configuration.addAllowedMethod("DELETE");
-        configuration.addAllowedMethod("PUT");
-
-        // 허용할 헤더 설정
-        configuration.addAllowedHeader("Origin");
-        configuration.addAllowedHeader("Content-Type");
-        configuration.addAllowedHeader("Accept");
-        configuration.addAllowedHeader("Authorization");
-        configuration.addAllowedHeader("X-AUTH-TOKEN");
-        configuration.addAllowedHeader("Authorization_Refresh");
-
-        // 자격 증명 허용 설정
-        configuration.setAllowCredentials(true);
-
-        // 노출할 헤더 설정
-        configuration.addExposedHeader("Content-Type");
-        configuration.addExposedHeader("X-AUTH-TOKEN");
-        configuration.addExposedHeader("Authorization");
-        configuration.addExposedHeader("Authorization_Refresh");
-
-        // pre-flight 요청 캐싱 시간 설정
-        configuration.setMaxAge(1728000L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-//        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app", "http://localhost:3000"));
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        // 허용할 출처 설정
+//        configuration.addAllowedOrigin("http://localhost:3000");
 //
 //        // 허용할 HTTP 메서드 설정
-//        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        configuration.addAllowedMethod("GET");
+//        configuration.addAllowedMethod("POST");
+//        configuration.addAllowedMethod("OPTIONS");
+//        configuration.addAllowedMethod("DELETE");
+//        configuration.addAllowedMethod("PUT");
 //
-//        // 허용할 요청 헤더 설정
-//        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type", "X-AUTH-TOKEN", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
+//        // 허용할 헤더 설정
+//        configuration.addAllowedHeader("Origin");
+//        configuration.addAllowedHeader("Content-Type");
+//        configuration.addAllowedHeader("Accept");
+//        configuration.addAllowedHeader("Authorization");
+//        configuration.addAllowedHeader("X-AUTH-TOKEN");
+//        configuration.addAllowedHeader("Authorization_Refresh");
 //
-//        // 클라이언트가 접근할 수 있도록 허용할 응답 헤더 설정
-//        configuration.setExposedHeaders(Arrays.asList("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
-//
-//        // 자격 증명을 포함한 요청 허용
+//        // 자격 증명 허용 설정
 //        configuration.setAllowCredentials(true);
 //
-//        // 특정 도메인에서의 요청 허용
-////        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app"));
+//        // 노출할 헤더 설정
+//        configuration.addExposedHeader("Content-Type");
+//        configuration.addExposedHeader("X-AUTH-TOKEN");
+//        configuration.addExposedHeader("Authorization");
+//        configuration.addExposedHeader("Authorization_Refresh");
+//
+//        // pre-flight 요청 캐싱 시간 설정
+//        configuration.setMaxAge(1728000L);
+//
 //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 //        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+////        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app", "http://localhost:3000"));
+////
+////        // 허용할 HTTP 메서드 설정
+////        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
+////
+////        // 허용할 요청 헤더 설정
+////        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type", "X-AUTH-TOKEN", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
+////
+////        // 클라이언트가 접근할 수 있도록 허용할 응답 헤더 설정
+////        configuration.setExposedHeaders(Arrays.asList("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
+////
+////        // 자격 증명을 포함한 요청 허용
+////        configuration.setAllowCredentials(true);
+////
+////        // 특정 도메인에서의 요청 허용
+//////        configuration.setAllowedOrigins(List.of("https://3ever.vercel.app"));
+////        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+////        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -130,14 +130,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .cors((corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource())))
+//                .cors((corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource())))
                 // 보안 컨텍스트의 저장 방식을 제어하는 설정
                 // 보안 컨텍스트가 명시적으로 저장될 때만 저장되도록 한다.
                 // 보안 컨텍스트가 실수로 변경되거나 저장되는 것을 방지하여 보안성을 높인다.
                 .securityContext(securityContext -> securityContext
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+//                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers("/api/**", "/oauth2/authorization/**").permitAll()
                         .anyRequest().authenticated())
 
