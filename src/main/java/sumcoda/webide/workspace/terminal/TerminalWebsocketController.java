@@ -36,9 +36,10 @@ public class TerminalWebsocketController {
    * @param request 실행할 명령어
    * @param headerAccessor 메시지 헤더 접근자
    */
-  @MessageMapping("/terminal/{workspaceId}")
+  @MessageMapping("/terminal/{workspaceId}/{userId}")
   public void executeTerminal(
           @DestinationVariable Long workspaceId,
+          @DestinationVariable String userId,
           @Payload CommandRequestDTO request,
           SimpMessageHeaderAccessor headerAccessor,
           Authentication authentication
@@ -69,7 +70,7 @@ public class TerminalWebsocketController {
     responseData.put("result", result);
     responseData.put("allEntries", allEntriesByWorkspaceId);
 
-    template.convertAndSend("/api/sub/terminal/" + workspaceId, responseData);
+    template.convertAndSend("/api/sub/terminal/" + workspaceId + "/" + userId, responseData);
 
   }
 }
