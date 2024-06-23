@@ -13,6 +13,7 @@ public interface EntryRepositoryCustom {
     Optional<Entry> findByPath(Long workspaceId, String path);
 
     Optional<EntryResponseDTO> findRootByWorkspaceIdDTO(Long workspaceId);
+    Optional<EntryResponseDTO> findByWorkspaceIdAndParentIdAndNameDTO(Long workspaceId, Long parentId, String name);
 
     List<EntryResponseDTO> findChildrenDTO(Long parentId);
 }
