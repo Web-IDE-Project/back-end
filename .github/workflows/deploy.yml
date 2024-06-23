@@ -29,7 +29,6 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest .
-
           echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
 
@@ -53,8 +52,9 @@ jobs:
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
 
-
         run: |
+          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
+          scp -o StrictHostKeyChecking=no src/main/resources/application-common.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-common.yml
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
@@ -63,6 +63,8 @@ jobs:
               sudo docker rm web-ide-3ever
           fi
           sudo docker run -d --name web-ide-3ever \
+            -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
+            -v /home/ubuntu/application-common.yml:/config/application-common.yml \
             -e SPRING_PROFILES_ACTIVE=prod,common \
             -e DB_URL=${PROD_DB_URL} \
             -e DB_USERNAME=${PROD_DB_USERNAME} \
