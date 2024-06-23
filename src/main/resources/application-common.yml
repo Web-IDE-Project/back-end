@@ -4,6 +4,7 @@ spring:
   config:
     activate:
       on-profile: "common"
+    additional-location: file:/config/
   jpa:
     hibernate:
       ddl-auto: create

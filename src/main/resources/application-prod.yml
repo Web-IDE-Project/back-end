@@ -2,6 +2,8 @@ spring:
   config:
     activate:
       on-profile: "prod"
+    additional-location: file:/config/
+
   datasource:
 
     url: ${PROD_DB_URL}
