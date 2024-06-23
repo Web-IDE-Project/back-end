@@ -73,7 +73,7 @@
 #CMD ["sh", "-c", "java -jar /app/app.jar & nginx -g 'daemon off;'"]
 
 ## Step 1: Spring Boot 애플리케이션 빌드
-#FROM openjdk:17-jdk-slim AS builder
+FROM openjdk:17-jdk-slim AS builder
 #WORKDIR /app
 #COPY . .
 #RUN ./gradlew build -x test
@@ -90,7 +90,7 @@
 #CMD ["java", "-jar", "/app/app.jar"]
 
 # Start with a base image containing Java runtime
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-jdk-slim AS builder
 
 # Add a volume pointing to /tmp
 VOLUME /app
