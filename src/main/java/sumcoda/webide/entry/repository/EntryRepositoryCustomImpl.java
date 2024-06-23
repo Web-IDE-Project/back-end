@@ -92,24 +92,6 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
                 .fetchOne());
     }
 
-    @Override
-    public Optional<EntryResponseDTO> findByWorkspaceIdAndParentIdAndNameDTO(Long workspaceId, Long parentId, String name) {
-
-        return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.bean(EntryResponseDTO.class,
-                        entry.id,
-                        entry.name,
-                        entry.isDirectory,
-                        entry.parent.id,
-                        entry.workspace.id))
-                .from(entry)
-                .where(entry.workspace.id.eq(workspaceId)
-                        .and(entry.parent.id.eq(parentId))
-                        .and(entry.name.eq(name)))
-                .fetchOne());
-
-    }
-
     /**
      * 주어진 부모 ID로 자식 엔트리 목록을 찾음
      *

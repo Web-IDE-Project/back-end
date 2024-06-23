@@ -152,7 +152,7 @@ public class TerminalService {
         }
 
         // 현재 경로에 동일한 이름의 파일이나 디렉토리가 있는지 확인
-        EntryResponseDTO existingEntry = entryRepository.findByWorkspaceIdAndParentIdAndNameDTO(workspaceId, currentEntry.getId(), newFileName).orElse(null);
+        Entry existingEntry = entryRepository.findByWorkspaceIdAndParentIdAndName(workspaceId, currentEntry.getId(), newFileName).orElse(null);
         if (existingEntry == null) {
             return "File or directory with the same name already exists";
         }
