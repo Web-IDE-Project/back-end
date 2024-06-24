@@ -4,7 +4,7 @@ spring:
   config:
     activate:
       on-profile: "prod"
-    additional-location: file:/config/
+    location: file:/config/
   jpa:
     hibernate:
       ddl-auto: create
