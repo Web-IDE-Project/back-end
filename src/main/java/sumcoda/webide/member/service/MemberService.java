@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,9 @@ public class MemberService {
     // 멤버를 조회하기 위한 필드
     private final MemberRepository memberRepository;
 
+    //변경된 비밀번호를 암호화 하기 위한 필드
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     // AWS S3 활용을 위해 필요한 설정 클래스
     private final AWSS3Config awss3Config;
 
@@ -45,8 +49,9 @@ public class MemberService {
         }
 
         // 비밀번호가 null이 아니면 비밀번호 업데이트
-        if (updateMemberRequestDTO.getPassword() != null) {
-            member.assignPassword(updateMemberRequestDTO.getPassword());
+        if (updateMemberRequestDTO.getPassword() != null && !updateMemberRequestDTO.getPassword().isEmpty()) {
+            String encryptedPassword = bCryptPasswordEncoder.encode(updateMemberRequestDTO.getPassword());
+            member.assignPassword(encryptedPassword);
         }
 
         if (profileImage == null || profileImage.isEmpty()) {
