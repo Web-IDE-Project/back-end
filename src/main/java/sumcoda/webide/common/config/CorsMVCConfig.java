@@ -13,7 +13,7 @@ public class CorsMVCConfig implements WebMvcConfigurer {
 //                .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용할 HTTP method
 //                .allowedHeaders("Authorization", "Authorization_Refresh", "Refresh-Token", "Cache-Control", "Content-Type", "X-AUTH-TOKEN", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
 //                .exposedHeaders("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-                .allowedOrigins("*")
+                .allowedOrigins("https://3ever.vercel.app")
                 .allowedMethods("*") // 허용할 HTTP method
                 .allowedHeaders("*")
                 .exposedHeaders("Content-Type", "X-AUTH-TOKEN", "Authorization", "Authorization_Refresh", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")

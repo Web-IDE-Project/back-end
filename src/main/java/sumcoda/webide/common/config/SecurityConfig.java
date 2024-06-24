@@ -87,7 +87,7 @@ public class SecurityConfig {
 //        configuration.addAllowedHeader("X-AUTH-TOKEN");
 //        configuration.addAllowedHeader("Authorization_Refresh");
 //
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOrigin("https://3ever.vercel.app");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
 
