@@ -64,18 +64,19 @@ jobs:
               sudo docker rm web-ide-3ever
           fi
           sudo docker run -d --name web-ide-3ever \
-            -e SPRING_PROFILES_ACTIVE=prod \
-            -e PROD_DB_URL=${PROD_DB_URL} \
-            -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
-            -e PROD_DB_PASSWORD=${PROD_DB_PASSWORD} \
-            -e PROD_S3_BUCKET_NAME=${PROD_S3_BUCKET_NAME} \
-            -e PROD_AWS_ACCESS_KEY=${PROD_AWS_ACCESS_KEY} \
-            -e PROD_AWS_SECRET_KEY=${PROD_AWS_SECRET_KEY} \
-            -e NAVER_CLIENT_ID=${NAVER_CLIENT_ID} \
-            -e NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET} \
-            -e GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
-            -e GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
-            -e KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID} \
-            -e KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET} \
-            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+           -p 8080:8080 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest \
+            --spring.profiles.active=prod \
+            --spring.datasource.url=${PROD_DB_URL} \
+            --spring.datasource.username=${PROD_DB_USERNAME} \
+            --spring.datasource.password=${PROD_DB_PASSWORD} \
+            --spring.security.oauth2.client.registration.naver.client-id=${NAVER_CLIENT_ID} \
+            --spring.security.oauth2.client.registration.naver.client-secret=${NAVER_CLIENT_SECRET} \
+            --spring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID} \
+            --spring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET} \
+            --spring.security.oauth2.client.registration.kakao.client-id=${KAKAO_CLIENT_ID} \
+            --spring.security.oauth2.client.registration.kakao.client-secret=${KAKAO_CLIENT_SECRET} \
+            --cloud.aws.s3.bucket-name=${PROD_S3_BUCKET_NAME} \
+            --cloud.aws.credentials.access-key=${PROD_AWS_ACCESS_KEY} \
+            --cloud.aws.credentials.secret-key=${PROD_AWS_SECRET_KEY} \
           EOF
