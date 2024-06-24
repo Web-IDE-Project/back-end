@@ -41,7 +41,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Transfer application-prod.yml to EC2
-        run: scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/application-prod.yml
+        run: scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
 
       - name: Deploy to EC2
         env:
