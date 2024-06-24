@@ -70,7 +70,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://3ever.vercel.app");
 
         // 허용할 HTTP 메서드 설정
         configuration.addAllowedMethod("GET");
