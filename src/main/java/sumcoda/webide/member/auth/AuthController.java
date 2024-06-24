@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,14 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/api/auth/status")
-    public ResponseEntity<?> isAuthenticated(Authentication authentication) {
+    public ResponseEntity<?> isAuthenticated() {
 
         Map<String, Object> responseData = new HashMap<>();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication == null) {
+            throw new IllegalStateException("No authentication information found");
+        }
         String username;
         if (authentication instanceof OAuth2AuthenticationToken) {
             // OAuth2.0 사용자
