@@ -1,18 +1,32 @@
 ![header](https://capsule-render.vercel.app/api?type=waving&height=250&color=48BB78&text=3Ever%20-%20Web%20IDE&textBg=false&fontColor=ffffff&fontSize=40&fontAlign=50&fontAlignY=39&section=header)
 
-### 프로젝트 소개
+# 3Ever
+
+## Web IDE Project - Backend
+
+- 개발 기간 : 2024/5/30 ~ 2024/6/24
+
+<br><br>
+
+## 배포 주소
+
+> [3Ever](http://ec2-3-34-144-78.ap-northeast-2.compute.amazonaws.com:8080/)
+
+<br><br>
+
+## 프로젝트 소개
 3Ever는 누구든, 언제든, 어디서든 강의자가 문제를 해결하는 과정을 실시간으로 보여주고, 수강생의 코딩하는 사고도 기를 수 있도록 도와주는 라이브코딩 웹 IDE 서비스입니다.
 
 <br><br>
 
-### 멤버 소개
+## 멤버 소개
 | <img src="https://avatars.githubusercontent.com/u/147473025?v=4" alt="공태현" width="150" height="150"> | <img src="https://avatars.githubusercontent.com/u/131665874?v=4" alt="김근호" width="150" height="150"> | <img src="https://avatars.githubusercontent.com/u/159746126?v=4" alt="이다솜" width="150" height="150"> | <img src="https://avatars.githubusercontent.com/u/120402129?v=4" alt="최민지" width="150" height="150"> |
 |:---:|:---:|:---:|:---:|
 | [공태현](https://github.com/runtime-zer0) | [김근호](https://github.com/geunhokinn) | [이다솜](https://github.com/serahissomi) | [최민지](https://github.com/meanzi3) |
 
 <br><br>
 
-### 역할 및 담당 기능
+## 역할 및 담당 기능
 
 | 이름  | 공태현                                                                | 김근호                                                                         | 이다솜                                                              | 최민지                                                               |
 | --- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
@@ -21,12 +35,12 @@
 
 <br><br>
 
-### 주요기능
+## 주요기능
 이미지
 
 <br><br>
 
-### 아키텍쳐
+## 아키텍쳐
 이미지
 
 <br><br>
