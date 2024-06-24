@@ -40,6 +40,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Transfer application-prod.yml to EC2
+        run: scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/application-prod.yml
+
       - name: Deploy to EC2
         env:
           PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
@@ -64,8 +67,9 @@ jobs:
               sudo docker rm web-ide-3ever
           fi
           sudo docker run -d --name web-ide-3ever \
-            -p 8080:8080 \
+            -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
             -e SPRING_PROFILES_ACTIVE=prod \
+            -e SPRING_CONFIG_LOCATION=/config/application-prod.yml \
             -e SPRING_DATASOURCE_URL=${PROD_DB_URL} \
             -e SPRING_DATASOURCE_USERNAME=${PROD_DB_USERNAME} \
             -e SPRING_DATASOURCE_PASSWORD=${PROD_DB_PASSWORD} \
@@ -93,7 +97,7 @@ jobs:
             -e SPRING_CLOUD_AWS_REGION_STATIC=ap-northeast-2 \
             -e SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${PROD_AWS_ACCESS_KEY} \
             -e SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${PROD_AWS_SECRET_KEY} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
           
           sudo docker exec web-ide-3ever printenv | grep SPRING
           sudo docker logs web-ide-3ever
