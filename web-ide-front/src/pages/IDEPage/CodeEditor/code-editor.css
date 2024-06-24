@@ -1,0 +1,4 @@
+.cm-editor {
+  min-height: calc(100vh - 285px);
+  height: calc(100vh - 285px);
+}

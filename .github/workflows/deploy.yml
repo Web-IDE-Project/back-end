@@ -1,4 +1,4 @@
-name: Deploy Spring Boot App
+name: Deploy Spring Boot and React Apps
 
 on:
   push:
@@ -17,29 +17,62 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Set up for Spring Boot app
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
+      - name: Build Spring Boot app with Gradle
         run: ./gradlew build -Dspring.profiles.active=prod
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest .
+      # Build Docker image for Spring Boot app
+      - name: Build Docker image for Spring Boot app
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:backend-latest -f Dockerfile .
 
+      # Set up for React app
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for React app
+        run: cd web-ide-front && npm install
+
+      - name: Generate Environment Variables File for Production
+        run: |
+          touch web-ide-front/.env
+          echo VITE_YORKIE_API_KEY=${{ secrets.VITE_YORKIE_API_KEY }} >> web-ide-front/.env
+          echo VITE_SERVER_BASE_URL=${{ secrets.VITE_SERVER_BASE_URL }} >> web-ide-front/.env
+          echo VITE_SERVER_WS_BASE_URL=${{ secrets.VITE_SERVER_WS_BASE_URL }} >> web-ide-front/.env
+          cat web-ide-front/.env
+
+      - name: Build React app
+        run: cd web-ide-front && npm run build
+
+      # Build Docker image for React app
+      - name: Build Docker image for React app
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:frontend-latest -f web-ide-front/Dockerfile .
+
+      # Docker login
       - name: Docker Login
         run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+      # Push Docker images
+      - name: Push Docker image for Spring Boot app
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:backend-latest:latest
 
+      - name: Push Docker image for React app
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:frontend-latest
+
+      # Set up SSH key
       - name: Add SSH Key
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      # Create environment variables file
       - name: Create environment variables file
         run: |
           echo SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }} > env.list
@@ -68,24 +101,38 @@ jobs:
           echo SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=10 >> env.list
           echo SPRING_CONFIG_LOCATION=/config/application-prod.yml >> env.list
 
-      - name: Transfer application-prod.yml to EC2
+      # Transfer files to EC2
+      - name: Transfer files to EC2
         run: |
           scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
           scp -o StrictHostKeyChecking=no env.list ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/env.list
 
+      # Deploy to EC2
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
-          if [ $(sudo docker ps -a -q -f name=web-ide-3ever) ]; then
-              sudo docker stop web-ide-3ever
-              sudo docker rm web-ide-3ever
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:backend-latest
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:frontend-latest
+
+          if [ $(sudo docker ps -a -q -f name=spring-app) ]; then
+              sudo docker stop spring-app
+              sudo docker rm spring-app
           fi
-          sudo docker run -d --name web-ide-3ever \
+          if [ $(sudo docker ps -a -q -f name=react-app) ]; then
+              sudo docker stop react-app
+              sudo docker rm react-app
+          fi
+
+          sudo docker run -d --name spring-app \
             --env-file /home/ubuntu/env.list \
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
-            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
-          sudo docker exec web-ide-3ever printenv | grep SPRING
-          sudo docker logs web-ide-3ever
+            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:backend-latest
+
+          sudo docker run -d --name react-app \
+            -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:frontend-latest
+
+          sudo docker exec spring-app printenv | grep SPRING
+          sudo docker logs spring-app
+          sudo docker logs react-app
           EOF

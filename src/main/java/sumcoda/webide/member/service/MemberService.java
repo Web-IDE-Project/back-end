@@ -72,7 +72,7 @@ public class MemberService {
 //                                    savedFilename,
 //                                    fullLocalPath));
 
-//                  // 이미지 S3 저장시 필요한것
+                    // 이미지 S3 저장시 필요한것
                     FileDTO fileDTO = FileStorageUtil.saveFile(profileImage);
 
                     String originalFilename = fileDTO.getOriginalFilename();
