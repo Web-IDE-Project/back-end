@@ -96,6 +96,8 @@ public class SecurityConfig {
         configuration.addExposedHeader("X-AUTH-TOKEN");
         configuration.addExposedHeader("Authorization");
         configuration.addExposedHeader("Authorization_Refresh");
+        configuration.addExposedHeader("Access-Control-Allow-Origin");
+        configuration.addExposedHeader("Access-Control-Allow-Credentials");
 
         // 자격 증명 허용 설정
         configuration.setAllowCredentials(true);
