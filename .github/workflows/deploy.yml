@@ -66,7 +66,6 @@ jobs:
           echo SPRING_PROFILES_ACTIVE=prod >> env.list
           echo SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=3000 >> env.list
           echo SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=10 >> env.list
-          echo SPRING_CONFIG_LOCATION=/config/application-prod.yml >> env.list
 
       - name: Transfer application-prod.yml to EC2
         run: |
