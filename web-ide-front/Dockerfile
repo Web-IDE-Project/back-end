@@ -1,21 +1,21 @@
-# react-app/Dockerfile
+# web-ide-front/Dockerfile
 # Stage 1: Build the React app
 FROM node:20-alpine as build
 
 WORKDIR /app
 
-COPY package.json ./
-COPY package-lock.json ./
+COPY ./web-ide-front/package.json ./
+COPY ./web-ide-front/package-lock.json ./
 RUN npm install
 
-COPY . ./
+COPY ./web-ide-front ./
 RUN npm run build
 
 # Stage 2: Serve the React app with Nginx
 FROM nginx:alpine
 
-COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY ./web-ide-front/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
