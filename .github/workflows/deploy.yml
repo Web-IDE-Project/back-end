@@ -84,7 +84,6 @@ jobs:
             --env-file /home/ubuntu/env.list \
             -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
             -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
-          
           sudo docker exec web-ide-3ever printenv | grep SPRING
           sudo docker logs web-ide-3ever
           EOF
