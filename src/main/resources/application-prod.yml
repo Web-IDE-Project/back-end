@@ -20,6 +20,17 @@ spring:
     username: ${PROD_DB_USERNAME}
     password: ${PROD_DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
+  cloud:
+    aws:
+      s3:
+        bucket-name: ${PROD_S3_BUCKET_NAME}
+      stack:
+        auto: false
+      region:
+        static: ap-northeast-2
+      credentials:
+        access-key: ${PROD_AWS_ACCESS_KEY}
+        secret-key: ${PROD_AWS_SECRET_KEY}
   security:
     oauth2:
       client:
@@ -63,14 +74,4 @@ logging:
       springframework:
         security: DEBUG
         web: DEBUG
-cloud:
-  aws:
-    s3:
-      bucket-name: ${PROD_S3_BUCKET_NAME}
-    stack:
-      auto: false
-    region:
-      static: ap-northeast-2
-    credentials:
-      access-key: ${PROD_AWS_ACCESS_KEY}
-      secret-key: ${PROD_AWS_SECRET_KEY}
+

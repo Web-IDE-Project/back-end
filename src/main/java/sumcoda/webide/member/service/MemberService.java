@@ -30,7 +30,7 @@ public class MemberService {
     private final AWSS3Config awss3Config;
 
     // S3에 등록된 버킷 이름
-    @Value("${cloud.aws.s3.bucket-name}")
+    @Value("${spring.cloud.aws.s3.bucket-name}")
     private String bucketName;
 
     @Transactional
