@@ -184,7 +184,7 @@ public class SecurityConfig {
         http.logout(auth -> auth
                 .logoutUrl("/api/auth/logout")
                 .logoutSuccessHandler(customLogoutSuccessHandler)
-                .deleteCookies("JSESSIONID", "remember-me"));
+                .deleteCookies("JSESSIONID"));
 
 
         http    // 하나의 아이디에 대해서 다중 로그인에 대한 처리
@@ -199,7 +199,7 @@ public class SecurityConfig {
 
         http
                 .sessionManagement(auth -> auth
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 )
                 .rememberMe(auth -> auth
 //                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
