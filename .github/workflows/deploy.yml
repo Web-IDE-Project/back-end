@@ -61,7 +61,7 @@ jobs:
 
       # Push Docker images
       - name: Push Docker image for Spring Boot app
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:backend-latest:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:backend-latest
 
       - name: Push Docker image for React app
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:frontend-latest
