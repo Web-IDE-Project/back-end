@@ -58,11 +58,11 @@ jobs:
           echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} >> env.list
           echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} >> env.list
           echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
-          echo CLOUD_AWS_S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }} >> env.list
-          echo CLOUD_AWS_STACK_AUTO=false >> env.list
-          echo CLOUD_AWS_REGION_STATIC=ap-northeast-2 >> env.list
-          echo CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
-          echo CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
+          echo SPRING_CLOUD_AWS_S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }} >> env.list
+          echo SPRING_CCLOUD_AWS_STACK_AUTO=false >> env.list
+          echo SPRING_CCLOUD_AWS_REGION_STATIC=ap-northeast-2 >> env.list
+          echo SPRING_CCLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
+          echo SPRING_CCLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
           echo SPRING_ACTIVATE_ON_PROFILE=prod >> env.list
           
           echo SPRING_CONFIG_LOCATION=/config/application-prod.yml >> env.list
