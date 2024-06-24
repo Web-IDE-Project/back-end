@@ -1,4 +1,5 @@
 #!/bin/bash
+chmod +x ./docker-build.sh
 
 echo "Building Docker images for compilers..."
 
