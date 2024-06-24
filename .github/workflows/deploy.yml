@@ -64,6 +64,7 @@ jobs:
               sudo docker rm web-ide-3ever
           fi
           sudo docker run -d --name web-ide-3ever \
+            -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e SPRING_DATASOURCE_URL=${PROD_DB_URL} \
             -e SPRING_DATASOURCE_USERNAME=${PROD_DB_USERNAME} \
@@ -81,10 +82,11 @@ jobs:
             -e SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
             -e SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID} \
             -e SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET} \
-            -e SPRING_CLOUD_AWS_S3_BUCKET_NAME=${PROD_S3_BUCKET_NAME} \
-            -e SPRING_CLOUD_AWS_STACK_AUTO=false \
-            -e SPRING_CLOUD_AWS_REGION_STATIC=ap-northeast-2 \
-            -e SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${PROD_AWS_ACCESS_KEY} \
-            -e SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${PROD_AWS_SECRET_KEY} \
-            -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+            -e CLOUD_AWS_S3_BUCKET_NAME=${PROD_S3_BUCKET_NAME} \
+            -e CLOUD_AWS_STACK_AUTO=false \
+            -e CLOUD_AWS_REGION_STATIC=ap-northeast-2 \
+            -e CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${PROD_AWS_ACCESS_KEY} \
+            -e CLOUD_AWS_CREDENTIALS_SECRET_KEY=${PROD_AWS_SECRET_KEY} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
+          sudo docker logs -f web-ide-3ever
           EOF
