@@ -70,31 +70,37 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 허용할 출처 설정
-        configuration.addAllowedOrigin("https://3ever.vercel.app");
+//        configuration.addAllowedOrigin("https://3ever.vercel.app");
 
-        // 허용할 HTTP 메서드 설정
-        configuration.addAllowedMethod("GET");
-        configuration.addAllowedMethod("POST");
-        configuration.addAllowedMethod("OPTIONS");
-        configuration.addAllowedMethod("DELETE");
-        configuration.addAllowedMethod("PUT");
+//        // 허용할 HTTP 메서드 설정
+//        configuration.addAllowedMethod("GET");
+//        configuration.addAllowedMethod("POST");
+//        configuration.addAllowedMethod("OPTIONS");
+//        configuration.addAllowedMethod("DELETE");
+//        configuration.addAllowedMethod("PUT");
+//
+//        // 허용할 헤더 설정
+//        configuration.addAllowedHeader("Origin");
+//        configuration.addAllowedHeader("Content-Type");
+//        configuration.addAllowedHeader("Accept");
+//        configuration.addAllowedHeader("Authorization");
+//        configuration.addAllowedHeader("X-AUTH-TOKEN");
+//        configuration.addAllowedHeader("Authorization_Refresh");
+//
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
 
-        // 허용할 헤더 설정
-        configuration.addAllowedHeader("Origin");
-        configuration.addAllowedHeader("Content-Type");
-        configuration.addAllowedHeader("Accept");
-        configuration.addAllowedHeader("Authorization");
-        configuration.addAllowedHeader("X-AUTH-TOKEN");
-        configuration.addAllowedHeader("Authorization_Refresh");
-
-        // 자격 증명 허용 설정
-        configuration.setAllowCredentials(true);
-
-        // 노출할 헤더 설정
+//        노출할 헤더 설정
         configuration.addExposedHeader("Content-Type");
         configuration.addExposedHeader("X-AUTH-TOKEN");
         configuration.addExposedHeader("Authorization");
         configuration.addExposedHeader("Authorization_Refresh");
+
+        // 자격 증명 허용 설정
+        configuration.setAllowCredentials(true);
+
+
 
         // pre-flight 요청 캐싱 시간 설정
         configuration.setMaxAge(1728000L);
