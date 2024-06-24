@@ -48,6 +48,7 @@ jobs:
           echo SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.mariadb.jdbc.Driver >> env.list
           echo SPRING_JPA_HIBERNATE_DDL_AUTO=create >> env.list
           echo SPRING_JPA_SHOW_SQL=true >> env.list
+          echo SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MariaDBDialect >> env.list
           echo SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=true >> env.list
           echo SPRING_JPA_PROPERTIES_HIBERNATE_HIGHLIGHT_SQL=true >> env.list
           echo SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS=true >> env.list
@@ -58,17 +59,17 @@ jobs:
           echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} >> env.list
           echo SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} >> env.list
           echo SPRING_CLOUD_AWS_S3_BUCKET_NAME=${{ secrets.PROD_S3_BUCKET_NAME }} >> env.list
-          echo SPRING_CCLOUD_AWS_STACK_AUTO=false >> env.list
-          echo SPRING_CCLOUD_AWS_REGION_STATIC=ap-northeast-2 >> env.list
-          echo SPRING_CCLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
-          echo SPRING_CCLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
-          echo SPRING_ACTIVATE_ON_PROFILE=prod >> env.list
-          
+          echo SPRING_CLOUD_AWS_STACK_AUTO=false >> env.list
+          echo SPRING_CLOUD_AWS_REGION_STATIC=ap-northeast-2 >> env.list
+          echo SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
+          echo SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
+          echo SPRING_PROFILES_ACTIVE=prod >> env.list
+          echo SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=3000 >> env.list
+          echo SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=10 >> env.list
           echo SPRING_CONFIG_LOCATION=/config/application-prod.yml >> env.list
 
       - name: Transfer application-prod.yml to EC2
         run: |
-          scp -o StrictHostKeyChecking=no src/main/resources/application-prod.yml ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/application-prod.yml
           scp -o StrictHostKeyChecking=no env.list ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/env.list
 
       - name: Deploy to EC2
@@ -82,7 +83,6 @@ jobs:
           fi
           sudo docker run -d --name web-ide-3ever \
             --env-file /home/ubuntu/env.list \
-            -v /home/ubuntu/application-prod.yml:/config/application-prod.yml \
             -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:latest
           sudo docker exec web-ide-3ever printenv | grep SPRING
           sudo docker logs web-ide-3ever
