@@ -48,7 +48,6 @@ jobs:
           echo SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.mariadb.jdbc.Driver >> env.list
           echo SPRING_JPA_HIBERNATE_DDL_AUTO=create >> env.list
           echo SPRING_JPA_SHOW_SQL=true >> env.list
-          echo SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MariaDBDialect >> env.list
           echo SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=true >> env.list
           echo SPRING_JPA_PROPERTIES_HIBERNATE_HIGHLIGHT_SQL=true >> env.list
           echo SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS=true >> env.list
