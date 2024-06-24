@@ -64,8 +64,7 @@ jobs:
           echo CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${{ secrets.PROD_AWS_ACCESS_KEY }} >> env.list
           echo CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{ secrets.PROD_AWS_SECRET_KEY }} >> env.list
           echo SPRING_ACTIVATE_ON_PROFILE=prod >> env.list
-          echo SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=3000 >> env.list
-          echo SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=10 >> env.list
+          
           echo SPRING_CONFIG_LOCATION=/config/application-prod.yml >> env.list
 
       - name: Transfer application-prod.yml to EC2
