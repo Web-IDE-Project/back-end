@@ -1,10 +1,5 @@
 server:
   port: 8080
-  servlet:
-    session:
-      cookie:
-        same-site: none
-        secure: off
 spring:
   application:
     name: WebIDE
