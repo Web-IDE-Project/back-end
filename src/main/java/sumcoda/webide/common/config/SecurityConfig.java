@@ -199,7 +199,7 @@ public class SecurityConfig {
 
         http
                 .sessionManagement(auth -> auth
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .rememberMe(auth -> auth
 //                        .useSecureCookie(true) // HTTPS 환경에서만 쿠키전송
