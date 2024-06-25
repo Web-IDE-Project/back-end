@@ -10,7 +10,7 @@
 
 ## 배포 주소
 
-> [3Ever](http://ec2-3-34-144-78.ap-northeast-2.compute.amazonaws.com:8080/)
+> [3Ever](https://3ever.vercel.app/)
 
 <br><br>
 
@@ -93,7 +93,7 @@ Spring Security, OAuth2를 이용하였으며 인증된 사용자의 상태는 �
 <br><br>
 
 ## 시연 영상
-[보러가기](https://www.canva.com/design/DAGI4FX3p20/xFEiQMyan_C39bIc9s2HEA/watch?utm_content=DAGI4FX3p20&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+[보러가기](https://www.youtube.com/watch?v=gfLYe-VhBAg)
 
 <br><br>
 
