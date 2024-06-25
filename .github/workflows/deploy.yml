@@ -130,7 +130,7 @@ jobs:
             -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:backend-latest
 
           sudo docker run -d --name react-app \
-            -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:frontend-latest
+            -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/webide3ever:frontend-latest
 
           sudo docker exec spring-app printenv | grep SPRING
           sudo docker logs spring-app
