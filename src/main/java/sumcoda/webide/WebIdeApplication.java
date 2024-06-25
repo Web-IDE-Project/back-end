@@ -22,11 +22,16 @@ public class WebIdeApplication {
     public void init() {
         try {
             // docker-build.sh 파일에 실행 권한 부여
-            ProcessBuilder chmodProcessBuilder = new ProcessBuilder("chmod", "+x", "./docker-build.sh");
+            ProcessBuilder chmodProcessBuilder = new ProcessBuilder("bash", "-c", "chmod +x ./docker-build.sh");
             Process chmodProcess = chmodProcessBuilder.start();
             int chmodExitCode = chmodProcess.waitFor();
             if (chmodExitCode != 0) {
-                log.error("Failed to set executable permission on docker-build.sh with exit code: " + chmodExitCode);
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(chmodProcess.getErrorStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        log.error(line);
+                    }
+                }
                 throw new InterruptedException("Failed to set executable permission on docker-build.sh.");
             }
 
