@@ -149,7 +149,7 @@ public class SecurityConfig {
                         .requireExplicitSave(true))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/api/**", "/oauth2/authorization/**").permitAll()
+                        .requestMatchers("/**", "/oauth2/authorization/**").permitAll()
                         .anyRequest().authenticated())
 
         // 추가 코드
