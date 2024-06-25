@@ -48,7 +48,7 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        redirectStrategy.sendRedirect(request, response, "http://localhost:3000/login/oauth/callback?isSuccess=false?error=" + errorMessage);
+        redirectStrategy.sendRedirect(request, response, " http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com/login/oauth/callback?isSuccess=false?error=" + errorMessage);
     }
 
     private String getOAuth2ErrorMessage(String errorMessage) {

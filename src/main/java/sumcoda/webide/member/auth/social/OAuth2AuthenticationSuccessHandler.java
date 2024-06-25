@@ -33,6 +33,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        redirectStrategy.sendRedirect(request, response , "http://localhost:3000/login/oauth/callback?isSuccess=true");
+        redirectStrategy.sendRedirect(request, response , " http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com/login/oauth/callback?isSuccess=true");
     }
 }
