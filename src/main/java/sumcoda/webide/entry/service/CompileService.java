@@ -24,12 +24,17 @@ public class CompileService {
     private final DockerClient dockerClient;
     private static final String DOCKER_SOCKET_PATH = "/var/run/docker.sock";
 
-    public CompileService() {
-        // Docker 소켓 경로 확인
-        if (!new File(DOCKER_SOCKET_PATH).exists()) {
-            throw new IllegalStateException("Docker socket not found at " + DOCKER_SOCKET_PATH);
+    public CompileService() throws InterruptedException {
+        // docker-build.sh 파일에 실행 권한 부여
+        File script = new File("/var/run/docker.sock");
+        if (!script.setExecutable(true)) {
+            throw new InterruptedException("Failed to set executable permission on docker-build.sh.");
         }
-
+//        // Docker 소켓 경로 확인
+//        if (!new File(DOCKER_SOCKET_PATH).exists()) {
+//            throw new IllegalStateException("Docker socket not found at " + DOCKER_SOCKET_PATH);
+//        }
+//        sudo chmod 666 /var/run/docker.sock
         // Docker 클라이언트 기본 설정
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
 
