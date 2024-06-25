@@ -8,7 +8,6 @@ import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.okhttp.OkDockerHttpClient;
 import org.springframework.stereotype.Service;
 
@@ -24,29 +23,21 @@ public class CompileService {
 
     private final DockerClient dockerClient;
 
-//    // 도커 실행에 필요한 의존성 주입
-//    public CompileService() {
-//        // Docker 클라이언트의 기본 설정
-//        DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
-//
-//        // OkHttp 클라이언트를 사용하여 Docker 클라이언트를 설정
-//        OkDockerHttpClient httpClient = new OkDockerHttpClient.Builder()
-//                .dockerHost(config.getDockerHost())
-//                .sslConfig(config.getSSLConfig())
-//                .build();
-//
-//        // Docker 클라이언트를 초기화
-//        this.dockerClient = DockerClientBuilder.getInstance(config)
-//                .withDockerHttpClient(httpClient)
-//                .build();
-//    }
-
+    // 도커 실행에 필요한 의존성 주입
     public CompileService() {
-        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost("unix:///var/run/docker.sock")
-                .withDockerTlsVerify(false)
+        // Docker 클라이언트의 기본 설정
+        DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+
+        // OkHttp 클라이언트를 사용하여 Docker 클라이언트를 설정
+        OkDockerHttpClient httpClient = new OkDockerHttpClient.Builder()
+                .dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig())
                 .build();
-        this.dockerClient = DockerClientBuilder.getInstance(config).build();
+
+        // Docker 클라이언트를 초기화
+        this.dockerClient = DockerClientBuilder.getInstance(config)
+                .withDockerHttpClient(httpClient)
+                .build();
     }
 
     /**
