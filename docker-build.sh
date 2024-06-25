@@ -1,5 +1,6 @@
 #!/bin/bash
-chmod +x ./docker-build.sh
+export DOCKER_HOST=unix:///var/run/docker.sock
+#chmod +x ./docker-build.sh
 
 echo "Building Docker images for compilers..."
 
