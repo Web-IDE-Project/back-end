@@ -31,6 +31,21 @@ public class WebIdeApplication {
 //                throw new InterruptedException("Failed to set executable permission on docker-build.sh.");
 //            }
 
+//            // docker-build.sh 파일에 실행 권한 부여
+//            String[] command = {"chmod", "+x", "./docker-build.sh"};
+//            Process chmodProcess = Runtime.getRuntime().exec(command);
+//            chmodProcess.waitFor();
+//
+//            // chmod 명령어가 성공적으로 실행되었는지 확인
+//            if (chmodProcess.exitValue() != 0) {
+//                throw new InterruptedException("Failed to set executable permission on docker-build.sh.");
+//            }
+
+//            // docker-build.sh 파일에 실행 권한 부여
+//            Path scriptPath = Paths.get("./docker-build.sh");
+//            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr-xr-x");
+//            Files.setPosixFilePermissions(scriptPath, permissions);
+
             // docker-build.sh 파일에 실행 권한 부여
             File script = new File("./docker-build.sh");
             if (!script.setExecutable(true)) {

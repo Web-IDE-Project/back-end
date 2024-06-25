@@ -22,19 +22,24 @@ import java.util.List;
 public class CompileService {
 
     private final DockerClient dockerClient;
+    private static final String DOCKER_SOCKET_PATH = "/var/run/docker.sock";
 
-    // 도커 실행에 필요한 의존성 주입
     public CompileService() {
-        // Docker 클라이언트의 기본 설정
+        // Docker 소켓 경로 확인
+        if (!new File(DOCKER_SOCKET_PATH).exists()) {
+            throw new IllegalStateException("Docker socket not found at " + DOCKER_SOCKET_PATH);
+        }
+
+        // Docker 클라이언트 기본 설정
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
 
-        // OkHttp 클라이언트를 사용하여 Docker 클라이언트를 설정
+        // OkHttp 클라이언트를 사용하여 Docker 클라이언트 설정
         OkDockerHttpClient httpClient = new OkDockerHttpClient.Builder()
                 .dockerHost(config.getDockerHost())
                 .sslConfig(config.getSSLConfig())
                 .build();
 
-        // Docker 클라이언트를 초기화
+        // Docker 클라이언트 초기화
         this.dockerClient = DockerClientBuilder.getInstance(config)
                 .withDockerHttpClient(httpClient)
                 .build();
