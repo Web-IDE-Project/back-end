@@ -70,7 +70,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 //        허용할 출처 설정
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://3.35.39.158:3000", "http://ec2-3-35-39-158.ap-northeast-2.compute.amazonaws.com:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://3.35.39.158:3000", "http://ec2-3-35-39-158.ap-northeast-2.compute.amazonaws.com:3000", "http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com"));
 
         // 허용할 HTTP 메서드 설정
         configuration.addAllowedMethod("GET");
