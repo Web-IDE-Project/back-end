@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 
 @Slf4j
@@ -29,6 +30,12 @@ public class WebIdeApplication {
 //                log.error("Failed to set executable permission on docker-build.sh with exit code: " + chmodExitCode);
 //                throw new InterruptedException("Failed to set executable permission on docker-build.sh.");
 //            }
+
+            // docker-build.sh 파일에 실행 권한 부여
+            File script = new File("./docker-build.sh");
+            if (!script.setExecutable(true)) {
+                throw new InterruptedException("Failed to set executable permission on docker-build.sh.");
+            }
 
             // docker-build.sh 스크립트 실행
             ProcessBuilder processBuilder = new ProcessBuilder("./docker-build.sh");
