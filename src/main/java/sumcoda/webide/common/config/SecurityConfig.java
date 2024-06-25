@@ -172,7 +172,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
 //                        .loginPage("/auth/login")
                         .authorizationEndpoint(oAuth2 -> oAuth2
-                                .baseUri("http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com/api/oauth2/authorization"))
+                                .baseUri("/api/oauth2/authorization"))
                         .redirectionEndpoint(oAuth2 -> oAuth2
                                 .baseUri("http://ec2-52-79-123-145.ap-northeast-2.compute.amazonaws.com/login/oauth2/code/**"))
                         .userInfoEndpoint(userInfoEndpointConfig ->
